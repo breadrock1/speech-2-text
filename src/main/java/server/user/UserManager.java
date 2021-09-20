@@ -1,6 +1,8 @@
 package server.user;
 
+import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentReference;
+import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import server.user.auth.CredentialsVerifier;
 import server.user.auth.PasswordUtils;
@@ -8,6 +10,8 @@ import server.user.auth.PasswordUtils;
 import javax.annotation.Nullable;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 
 import static server.util.FutureUtils.getFuture;
 
@@ -23,24 +27,44 @@ public class UserManager {
         this.db = db;
     }
 
+
+    //TODO: Need test this codeblock
+    private User createNewUser(String login, String password) {
+        try {
+            ApiFuture<DocumentSnapshot> docRefs = userDocument(login).get();
+            DocumentSnapshot docSnapshot = docRefs.get();
+            User user = Optional.ofNullable(docSnapshot.toObject(User.class))
+                    .orElse(new User(login, PasswordUtils.hash(password), System.currentTimeMillis()));
+
+            save(user);
+            return user;
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public User createUser(String login, String password) throws UserCreationException {
         credentialsVerifier.verifyLogin(login);
         credentialsVerifier.verifyPassword(password);
 
-        User result = getFuture(db.runTransaction(transaction -> {
-            User currentUser = userDocument(login).get().get().toObject(User.class);
-            if (currentUser != null) {
-                return null;
-            }
-            User newUser = new User(login, PasswordUtils.hash(password), System.currentTimeMillis());
-            save(newUser);
-            return newUser;
-        }));
+//        User result = getFuture(db.runTransaction(transaction -> {
+//            User currentUser = userDocument(login).get().get().toObject(User.class);
+//            if (currentUser != null) {
+//                return null;
+//            }
+//            User newUser = new User(login, PasswordUtils.hash(password), System.currentTimeMillis());
+//            save(newUser);
+//            return newUser;
+//        }));
+//
+//        if (result == null) {
+//            throw new UserCreationException(UserCreationException.Reason.ALREADY_EXIST);
+//        }
+//        return result;
 
-        if (result == null) {
-            throw new UserCreationException(UserCreationException.Reason.ALREADY_EXIST);
-        }
-        return result;
+        return Optional.ofNullable(getFuture(db.runTransaction(transaction -> createNewUser(login, password))))
+                .orElseThrow(() -> new UserCreationException(UserCreationException.Reason.ALREADY_EXIST));
     }
 
     @Nullable

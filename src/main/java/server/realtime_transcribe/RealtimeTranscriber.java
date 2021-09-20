@@ -98,6 +98,11 @@ public class RealtimeTranscriber {
                         .setStreamingConfig(streamingRecognitionConfig)
                         .build(); // The first request in a streaming call has to be a config
 
+//        FlacAudioFileReader mp= new FlacAudioFileReader();
+//        AudioInputStream in=mp.getAudioInputStream(new URL(url));
+//        AudioFormat targetFormat = new AudioFormat(16000, 16, 1, true, false);
+//        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(targetFormat, in);
+
         clientStream.send(request);
 
         ready = true;

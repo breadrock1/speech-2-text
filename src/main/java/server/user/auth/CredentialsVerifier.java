@@ -6,6 +6,8 @@ import java.util.function.IntPredicate;
 
 public class CredentialsVerifier {
 
+    private final static int MIN_PASSWORD_LENGTH = 6;
+
     private final IntPredicate codePointPredicate =
             codePoint -> Character.isLetterOrDigit(codePoint) || codePoint == '_';
 
@@ -16,7 +18,7 @@ public class CredentialsVerifier {
     }
 
     public void verifyPassword(String password) throws UserCreationException {
-        if (password.length() < 6) {
+        if (password.length() < MIN_PASSWORD_LENGTH) {
             throw new UserCreationException(UserCreationException.Reason.PASSWORD_TOO_SHORT);
         }
     }
