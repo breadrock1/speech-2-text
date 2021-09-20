@@ -1,0 +1,89 @@
+<script src="/api.js"></script>
+
+<audio></audio>
+<h1 id="title"></h1>
+<h3 id="conferenceId"></h3>
+
+<button id="btn-finish">Завершить конференцию</button>
+
+<p id="transcripts"></p>
+
+<script src="/summary.js"></script>
+
+<script type="text/javascript">
+    const query = new URLSearchParams(window.location.search)
+    const conferenceId = query.get("conference_id")
+    const conferenceName = query.get("conference_name")
+    const isHost = query.get("is_host") != null
+    const ready = conferenceId != null && conferenceName != null
+
+    document.getElementById("title").innerHTML = `${conferenceName} [${conferenceId}]`
+</script>
+
+<script>
+const conferenceApi = ConferenceApi()
+const summary = Summary(document.querySelector('audio'))
+const transcripts = document.getElementById("transcripts")
+
+var finalTranscriptList = []
+var interimTranscriptMap = {}
+
+function displayTranscripts(response) {
+    var html = "<b>Participants:</b><br/>"
+
+    html += "<ol>"
+    response.participants.forEach(t => {
+        html += "<li>" + t.name + "</li>"
+    })
+    html += "</ol></br>"
+
+    html += "<b>Transcripts:</b>"
+
+	response.transcripts.forEach(t => {
+        if (t.isFinal) {
+            finalTranscriptList.push(t)
+            delete interimTranscriptMap[t.participantId]
+        } else {
+            interimTranscriptMap[t.participantId] = t
+        }
+    })
+    if (finalTranscriptList.length > 10) {
+        finalTranscriptList.splice(0, finalTranscriptList.length - 10)
+    }
+
+	finalTranscriptList.forEach(t => {
+		html += "<p style='color:green'><b>" + t.participantName + ":</b> " + t.value + "</p>"
+	})
+
+	for (var participantId in interimTranscriptMap) {
+		var t = interimTranscriptMap[participantId]
+  		html += "<p style='color:red'><b>" + t.participantName + ":</b> " + t.value + "</p>"
+	}
+
+    transcripts.innerHTML = html
+}
+
+function backToMain() {
+	window.location = "main"
+}
+
+if (ready) {
+	summary.startRecording(blob => {
+        conferenceApi.chunk(conferenceId, blob, displayTranscripts)
+    })
+} else {
+	alert("Bad params")
+}
+
+document.getElementById('btn-finish').onclick = function() {
+    this.disabled = true;
+    summary.stopRecording(function() {
+        if (isHost) {
+            conferenceApi.finish(conferenceId, backToMain)
+        } else {
+            backToMain()
+        }
+    });
+};
+
+</script>

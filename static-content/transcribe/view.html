@@ -1,0 +1,104 @@
+<title>Расшифровка</title>
+
+<style type="text/css">
+#transcript {
+    width: 100%;
+    height: 80%;
+    overflow: auto;
+    border: 1px solid black;
+    padding: 8px;
+    text-align: justify;
+    background: transparent;
+}
+</style>
+
+<script src="/api.js"></script>
+
+<script type="text/javascript">
+    const transcribeApi = TranscribeApi()
+
+    const query = new URLSearchParams(window.location.search)
+    const transcribeId = query.get("transcribe_id")
+
+    var config
+    var scheduledEditId
+
+    function getTranscript() {
+        var transcript = document.getElementById("transcript")
+        transcript.innerHTML = "Загрузка..."
+        transcribeApi.get(transcribeId, function(response) {
+            transcript.innerHTML = response.html
+            document.getElementById("player").src = response.audioUrl
+            config = response.config
+        })
+    }
+
+    function editTranscript() {
+        var saveBtn = document.getElementById("saveBtn")
+        var status = document.getElementById("status")
+        var text = document.getElementById("transcript").innerHTML
+        transcribeApi.edit(transcribeId, text, function(response) {
+            if (response.success) {
+                status.style.color = "green"
+                status.innerHTML = "Сохранено"
+            } else {
+                status.style.color = "red"
+                status.innerHTML = "Ошибка сохранения"
+            }
+            saveBtn.style.display = "none";
+            setTimeout(function() {
+                saveBtn.style.display = "block"
+                status.innerHTML = ""
+            }, 2000)
+        })
+    }
+
+    function onTranscriptChanged() {
+        if (scheduledEditId !== undefined) {
+            clearTimeout(scheduledEditId)
+        }
+        scheduledEditId = setTimeout(editTranscript, 2000)
+    }
+
+    function goToMain() {
+        window.location = 'upload'
+    }
+
+    function showConfig() {
+        var text = ""
+        for (const [key, value] of Object.entries(config)) {
+            text += `${key}: ${value}\n`
+        }
+        alert(text)
+    }
+
+    function setPlayback(timestamp) {
+        var player = document.getElementById("player")
+        player.currentTime = timestamp
+        player.play()
+    }
+
+</script>
+
+<button type="button" onclick="goToMain()">На главный экран</button>
+
+<table cellpadding="8">
+    <tr>
+        <td>
+            <audio id="player" controls>Your browser does not support the audio element.</audio>
+        </td>
+        <td>
+            <button id="saveBtn" type="button" onclick="editTranscript()">Сохранить</button>
+            <div id="status"></div>
+        </td>
+        <td>
+            <button type="button" onclick="showConfig()">Параметры</button>
+        </td>
+    </tr>
+</table>
+
+<div id="transcript" contenteditable="true" oninput="onTranscriptChanged()"></div>
+
+<script type="text/javascript">
+    getTranscript()
+</script>

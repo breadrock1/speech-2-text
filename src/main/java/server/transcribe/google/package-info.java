@@ -1,0 +1,4 @@
+@ParametersAreNonnullByDefault
+package server.transcribe.google;
+
+import javax.annotation.ParametersAreNonnullByDefault;

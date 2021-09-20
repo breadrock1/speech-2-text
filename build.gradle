@@ -1,0 +1,104 @@
+import java.nio.file.Paths
+
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '5.2.0'
+}
+
+group 'org.example'
+version '1.0.0'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'javax.inject:javax.inject:1'
+    compile 'com.google.cloud:google-cloud-speech:1.24.0'
+    compile 'com.google.cloud:google-cloud-storage:1.111.2'
+    compile 'commons-cli:commons-cli:1.4'
+    compile 'com.google.code.gson:gson:2.8.6'
+    compile 'commons-io:commons-io:2.6'
+    compile 'commons-fileupload:commons-fileupload:1.4'
+    compile 'org.apache.commons:commons-lang3:3.11'
+    implementation 'org.apache.commons:commons-text:1.9'
+
+    compile 'com.squareup.retrofit2:retrofit:2.9.0'
+    compile 'javax.servlet:javax.servlet-api:3.0.1'
+    compile 'com.google.firebase:firebase-admin:7.1.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+
+    compile 'io.jsonwebtoken:jjwt-api:0.11.2'
+    runtime 'io.jsonwebtoken:jjwt-impl:0.11.2'
+    runtime 'io.jsonwebtoken:jjwt-gson:0.11.2'
+
+    implementation platform('com.google.cloud:libraries-bom:16.3.0')
+    compile 'com.google.cloud:google-cloud-logging'
+
+    implementation platform('com.amazonaws:aws-java-sdk-bom:1.11.860')
+    implementation 'com.amazonaws:aws-java-sdk-s3'
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+shadowJar {
+    mergeServiceFiles()
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'server.DemoServer'
+    }
+}
+
+tasks.register("updateRevision") {
+    doLast {
+        def serverDir = new File((File) sourceSets.main.java.getSrcDirs().first(), "server")
+        def serverFile = new File(serverDir, "DemoServer.java")
+        def revision = bumpVersion(serverFile)
+        commitAndPush(serverFile, revision)
+    }
+}
+
+private static int bumpVersion(File serverFile) {
+    def content = serverFile.text
+    def matcher = content.replace('\n', ' ') =~ /.*int REVISION.=.(\d+)/
+    if (!matcher.find()) {
+        throw new GradleException("REVISION not found")
+    }
+    def revision = matcher.group(1).trim().toInteger()
+    def newRevision = revision + 1
+    serverFile.text = content.replace("int REVISION = $revision", "int REVISION = $newRevision")
+    return newRevision
+}
+
+private static void commitAndPush(File serverFile, int revision) {
+    exec("git", "add", serverFile.getAbsolutePath())
+    exec("git", "commit", "-m", "revision $revision")
+    exec("git", "tag", "r$revision")
+    def branch = exec("git", "rev-parse", "--abbrev-ref", "HEAD")
+    exec("git", "push", "origin", branch)
+    exec("git", "push", "--tags", "origin", branch)
+}
+
+private static String exec(String... command) {
+    def proc = command.execute()
+    def out = new StringBuffer()
+    def err = new StringBuffer()
+    proc.consumeProcessOutput(out, err)
+    def exitCode = proc.waitFor()
+    if (exitCode != 0) {
+        throw new GradleException("Fail to execute '$command': [$exitCode] ${err.toString()}")
+    }
+    return out.toString().trim()
+}
+
+task generateDocumentation(type: JavaExec) {
+    group = "Documentation"
+    description = "Generate API documentation"
+    classpath = sourceSets.main.runtimeClasspath
+    main = "doc.DocMain"
+    args(Paths.get(rootDir.absolutePath, "static-content", "docs").toAbsolutePath().toString(), "api.html")
+}

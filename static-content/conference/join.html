@@ -1,0 +1,32 @@
+<title>Войти в конференцию</title>
+
+<script src="/api.js"></script>
+
+<script type="text/javascript">
+    const conferenceApi = ConferenceApi()
+
+    function joinConference() {
+        const conferenceId = document.getElementById("conf-id").value
+        const speakerName = document.getElementById("speaker-name").value
+        conferenceApi.joinSpeaker(conferenceId, speakerName, function(response) {
+            window.location = `room?conference_id=${response.conferenceId}&conference_name=${encodeURIComponent(response.conferenceName)}`
+        })
+    }
+
+</script>
+
+<table>
+    <tr>
+        <td><label for="conf-id">ID конференции:</label></td>
+        <td><input type="text" id="conf-id" name="conf-id"></td>
+    </tr>
+
+    <tr>
+        <td><label for="speaker-name">Имя участника:</label></td>
+        <td><input type="text" id="speaker-name" name="speaker-name"></td>
+    </tr>
+</table>
+
+<br/><br/>
+
+<button type="button" onclick="joinConference()">Войти в конференцию</button>

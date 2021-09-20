@@ -1,0 +1,7 @@
+{
+  "host": "0.0.0.0",
+  "port": 8080,
+  "staticContentDir": "../../static-content",
+  "loggerType": "google-cloud",
+  "authSecretKey": "lhUm6skqFTRQMUqoLDb49rg6USOu+Vkkw2cgdq5pd0Q="
+}

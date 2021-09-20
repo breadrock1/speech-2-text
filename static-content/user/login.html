@@ -1,0 +1,33 @@
+<title>Войти</title>
+
+<script src="/api.js"></script>
+
+<script type="text/javascript">
+    const userApi = UserApi()
+
+    function login() {
+        const login = document.getElementById("user-login").value
+        const password = document.getElementById("user-password").value
+        userApi.login(login, password, function(response) {
+            alert("Success")
+            window.location = "/"
+        })
+    }
+
+</script>
+
+<table>
+    <tr>
+        <td><label for="user-login">Логин:</label></td>
+        <td><input type="text" id="user-login" name="user-login"></td>
+    </tr>
+
+    <tr>
+        <td><label for="user-password">Пароль:</label></td>
+        <td><input type="password" id="user-password" name="user-password"></td>
+    </tr>
+</table>
+
+<br/><br/>
+
+<button type="button" onclick="login()">Войти</button>

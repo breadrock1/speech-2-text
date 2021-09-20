@@ -1,0 +1,8 @@
+[
+    {
+      "origin": ["https://summary.team"],
+      "method": ["PUT"],
+      "responseHeader": [],
+      "maxAgeSeconds": 3600
+    }
+]

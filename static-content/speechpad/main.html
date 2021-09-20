@@ -1,0 +1,69 @@
+<title>SpeechPad</title>
+
+<audio></audio>
+
+<script src="/summary.js"></script>
+<script src="/api.js"></script>
+
+<button id="btn-start">Начать запись</button>
+<select id="model">
+    <option value="command_and_search">command_and_search</option>
+    <option value="phone_call">phone_call</option>
+    <option value="default">default</option>
+</select>
+
+<br/><br/>
+<button id="btn-finish">Закончить запись</button>
+
+<br/><br/>
+
+<textarea id="output" style="width: 100%; height: 80%"></textarea>
+
+<script type="text/javascript">
+    const summary = Summary(document.querySelector('audio'))
+    const speechpadApi = new SpeechpadApi()
+
+    var speechpadId
+
+    const output = document.getElementById('output')
+    const model = document.getElementById('model')
+    const startBtn = document.getElementById('btn-start')
+    const finishBtn = document.getElementById('btn-finish')
+    finishBtn.disabled = true
+
+    startBtn.onclick = function() {
+        this.disabled = true;
+        model.disabled = true
+        speechpadApi.create(model.value, function(response) {
+            speechpadId = response.speechpadId
+            finishBtn.disabled = false
+            summary.startRecording(chunkCallback)
+        })
+    }
+
+    finishBtn.onclick = function() {
+        this.disabled = true;
+        summary.stopRecording(function() {
+            startBtn.disabled = false
+            model.disabled = false
+        })
+    }
+
+    function chunkCallback(blob) {
+        speechpadApi.chunk(speechpadId, blob, showResults)
+    }
+
+    var finalText = ""
+
+    function showResults(response) {
+        response.results.forEach(r => {
+            if (r.isFinal) {
+                finalText += " " + r.transcript
+                output.value = finalText
+            } else {
+                output.value = finalText + " <" + r.transcript + ">"
+            }
+        })
+    }
+
+</script>
