@@ -35,13 +35,14 @@ public class SpeechpadManager {
         return speechpad;
     }
 
-    //TODO: Need check that this code work correctly
-    public void delete(String speechpadId) {
+    //TODO: Need realize dis code
+    public boolean delete(String speechpadId) {
         synchronized (speechpadMap) {
             if (!speechpadMap.containsKey(speechpadId)) {
-                return;
+                return false;
             }
             speechpadMap.remove(speechpadId);
+            return true;
         }
     }
 

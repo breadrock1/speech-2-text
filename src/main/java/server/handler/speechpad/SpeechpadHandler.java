@@ -10,11 +10,11 @@ import server.http.annotation.SummaryHttpHandler;
 import server.localization.CurrentLocale;
 import server.localization.StringId;
 import server.logging.Logger;
+import server.response.GenericResponse;
 import server.response.speechpad.SpeechpadChunkResponse;
 import server.response.speechpad.SpeechpadCreateResponse;
 import server.response.speechpad.SpeechpadGetAllResponse;
 import server.response.speechpad.SpeechpadGetResponse;
-import server.response.speechpad.SpeechpadRemoveResponse;
 import server.response.speechpad.SpeechpadRenameResponse;
 import server.response.transcribe.TranscribeResult;
 import server.speechpad.NoSuchSpeechpadException;
@@ -71,17 +71,17 @@ public class SpeechpadHandler {
     //TODO: need realized methods to edit, delete and create new archive speech
     @Description("Изменить название архивной записи")
     @HandlePost("/remove")
-    SpeechpadRemoveResponse remove(
+    GenericResponse remove(
             @Query("speechpad_id") String speechpadId
     ) {
         logger.info("Handle speechpad remove");
-        speechpadManager.delete(speechpadId);
-        return new SpeechpadRemoveResponse(speechpadId);
+        boolean status = speechpadManager.delete(speechpadId);
+        return new GenericResponse(status);
     }
 
     @Description("Изменить название архивной записи")
     @HandlePost("/rename")
-    SpeechpadRenameResponse edit(
+    SpeechpadRenameResponse rename(
             @Query("speechpad_id") String speechpadId,
             @Query("new_name") String newName
     ) throws NoSuchSpeechpadException {
