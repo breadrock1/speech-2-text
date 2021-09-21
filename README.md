@@ -1,4 +1,4 @@
-##Installing and running
+## Installing and running
 
 0.1. Download and install `gradle` >= 5.2.1 (IDEA may offer install it automatically);
 0.2. Download and install `open-jdk` 1.8 (IDEA may offer install it automatically);
@@ -12,17 +12,17 @@
 8. You can change other fields into this file if you really wanna it.
 
 
-##Test user credentials
+## Test user credentials
 
 username: `T3st0v`
 password: `T3st0v`
 
 
-##REST API of Speechpad Handler
+## REST API of Speechpad Handler
 
 First important stage is login as test user!
 
-###1. Create -> POST 
+### 1. Create -> POST 
 
 Creates new archive and returns id, name and status. 
 
@@ -40,7 +40,7 @@ response:
 
 P.S.: I dont really know whf is it - POST request but passing params into URL... OMG!
 
-###2. getAll -> GET
+### 2. getAll -> GET
 
 Returns all archives.
 
@@ -69,7 +69,7 @@ response:
 }
 ```
 
-###3. get -> GET
+### 3. get -> GET
 
 Returns archive object by specified id.
 
@@ -95,7 +95,7 @@ response:
 }
 ```
 
-###4. rename -> POST
+### 4. rename -> POST
 
 Returns renamed archive object.
 
@@ -111,7 +111,7 @@ response:
 }
 ```
 
-###5. remove -> POST
+### 5. remove -> POST
 
 Removes archive object by specified id.
 
