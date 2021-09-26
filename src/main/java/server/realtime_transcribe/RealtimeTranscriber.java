@@ -44,6 +44,11 @@ public class RealtimeTranscriber {
         clientStream.send(request);
     }
 
+    public synchronized void setEditedResult(TranscribeResult result) {
+        this.transcribeResults.clear();
+        this.transcribeResults.add(result);
+    }
+
     public List<TranscribeResult> flushResult() {
         List<TranscribeResult> result;
         synchronized (transcribeResults) {

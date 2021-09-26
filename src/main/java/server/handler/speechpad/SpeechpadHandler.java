@@ -108,4 +108,19 @@ public class SpeechpadHandler {
         return new SpeechpadGetResponse(speechpad);
     }
 
+    public SpeechpadChunkResponse edit(
+            @Query("speechpad_id") String speechpadId,
+            @Body String body
+    ) throws HandlerException {
+        try {
+            logger.info("Handle speechpad edit result text");
+            Speechpad speechpad = speechpadManager.getSpeechpad(speechpadId);
+            TranscribeResult transcribeResult = new TranscribeResult(body);
+            List<TranscribeResult> result = speechpad.setEditedResult(transcribeResult);
+            return new SpeechpadChunkResponse(result);
+        } catch (NoSuchSpeechpadException e) {
+            throw new HandlerException(200, errorResponse(StringId.SPEECHPAD_NOT_EXIST, locale));
+        }
+    }
+
 }
