@@ -2,6 +2,7 @@ FROM openjdk:8
 COPY . /usr/app
 
 WORKDIR /usr/app
+RUN /usr/local/openjdk-8/bin/java --version
 RUN ./gradlew shadowJar --no-daemon
 RUN ./gradlew generateDocumentation --no-daemon
 #ENV GOOGLE_APPLICATION_CREDENTIALS ../../nodal-thunder-279319-7a4d2b6d03a6.json
