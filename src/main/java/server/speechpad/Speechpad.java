@@ -8,9 +8,7 @@ import java.util.List;
 
 public class Speechpad {
 
-    //TODO: Need think more!!!
     private String name;
-
     private final String id;
     private final RealtimeTranscriber transcriber;
 
