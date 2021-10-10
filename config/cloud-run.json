@@ -3,5 +3,5 @@
   "port": 8080,
   "staticContentDir": "../../static-content",
   "loggerType": "google-cloud",
-  "authSecretKey": "IQeTx7s+rR3WFC+fu6/YaK8mqMlf2bsWYRrehzj5"
+  "authSecretKey": "lhUm6skqFTRQMUqoLDb49rg6USOu+Vkkw2cgdq5pd0Q="
 }
