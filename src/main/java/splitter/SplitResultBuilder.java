@@ -43,6 +43,8 @@ class SplitResultBuilder {
         byte[] getAllBytes() {
             byte[] allBytes = new byte[totalByteCount];
             int destPos = 0;
+
+            //TODO: Stream... Only this way is right
             for (byte[] chunk : this) {
                 System.arraycopy(chunk, 0, allBytes, destPos, chunk.length);
                 destPos += chunk.length;

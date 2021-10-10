@@ -5,6 +5,7 @@ import com.google.cloud.firestore.Firestore;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static server.util.FutureUtils.getFuture;
 
@@ -33,10 +34,7 @@ public class UserSettingsManager {
 
     public String get(User user, String key) {
         Map<String, Object> data = getFuture(settingsDocument(user).get()).getData();
-        if (data == null) {
-            return "";
-        }
-        return (String) data.getOrDefault(key, "");
+        return (data == null) ? "" : (String) data.getOrDefault(key, "");
     }
 
     public void remove(User user, String key) {
@@ -52,7 +50,8 @@ public class UserSettingsManager {
     }
 
     private DocumentReference settingsDocument(User user) {
-        return db.collection(SETTINGS_COLLECTION).document(user.getLogin());
+        return db.collection(SETTINGS_COLLECTION)
+                .document(user.getLogin());
     }
 
 }

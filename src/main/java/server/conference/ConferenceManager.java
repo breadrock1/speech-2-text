@@ -3,10 +3,7 @@ package server.conference;
 import com.google.cloud.firestore.Firestore;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ConferenceManager {
 
@@ -55,11 +52,8 @@ public class ConferenceManager {
     public synchronized ArchivedConference getArchivedConference(
             final String conferenceId
     ) throws NoSuchConferenceException {
-        ArchivedConference conference = archive.get(conferenceId);
-        if (conference == null) {
-            throw new NoSuchConferenceException(conferenceId);
-        }
-        return conference;
+        return Optional.ofNullable(archive.get(conferenceId))
+                .orElseThrow(() -> new NoSuchConferenceException(conferenceId));
     }
 
     public static ConferenceManager createInstance(Firestore firestore) throws IOException {

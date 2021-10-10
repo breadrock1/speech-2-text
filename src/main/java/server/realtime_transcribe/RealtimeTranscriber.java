@@ -44,6 +44,11 @@ public class RealtimeTranscriber {
         clientStream.send(request);
     }
 
+    public synchronized void setEditedResult(TranscribeResult result) {
+        this.transcribeResults.clear();
+        this.transcribeResults.add(result);
+    }
+
     public List<TranscribeResult> flushResult() {
         List<TranscribeResult> result;
         synchronized (transcribeResults) {
@@ -97,6 +102,11 @@ public class RealtimeTranscriber {
                 StreamingRecognizeRequest.newBuilder()
                         .setStreamingConfig(streamingRecognitionConfig)
                         .build(); // The first request in a streaming call has to be a config
+
+//        FlacAudioFileReader mp= new FlacAudioFileReader();
+//        AudioInputStream in=mp.getAudioInputStream(new URL(url));
+//        AudioFormat targetFormat = new AudioFormat(16000, 16, 1, true, false);
+//        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(targetFormat, in);
 
         clientStream.send(request);
 

@@ -24,7 +24,7 @@ public class QuickstartSample {
         try (SpeechClient speechClient = SpeechClient.create()) {
 
             // The path to the audio file to transcribe
-            String fileName = "/Users/dalpopov/Downloads/Demo.wav";
+            String fileName = (String) args[0];
 
             // Reads the audio file into memory
             Path path = Paths.get(fileName);
@@ -39,19 +39,32 @@ public class QuickstartSample {
                             .setLanguageCode("ru-RU")
                             .setEnableAutomaticPunctuation(true)
                             .build();
-            RecognitionAudio audio = RecognitionAudio.newBuilder().setContent(audioBytes).build();
 
-            // Performs speech recognition on the audio file
-            RecognizeResponse response = speechClient.recognize(config, audio);
-            List<SpeechRecognitionResult> results = response.getResultsList();
+            RecognitionAudio audio =
+                    RecognitionAudio.newBuilder()
+                            .setContent(audioBytes)
+                            .build();
 
-            for (SpeechRecognitionResult result : results) {
-                // There can be several alternative transcripts for a given chunk of speech. Just use the
-                // first (most likely) one here.
-                SpeechRecognitionAlternative alternative = result.getAlternativesList().get(0);
-                System.out.printf("Confidence: %f%n", alternative.getConfidence());
-                System.out.printf("Transcription: %s%n", alternative.getTranscript());
-            }
+            speechClient.recognize(config, audio)
+                    .getResultsList()
+                    .forEach(QuickstartSample::test);
+
+//            // Performs speech recognition on the audio file
+//            RecognizeResponse response = speechClient.recognize(config, audio);
+//            List<SpeechRecognitionResult> results = response.getResultsList();
+//            for (SpeechRecognitionResult result : results) {
+//                // There can be several alternative transcripts for a given chunk of speech. Just use the
+//                // first (most likely) one here.
+//                SpeechRecognitionAlternative alternative = result.getAlternativesList().get(0);
+//                System.out.printf("Confidence: %f%n", alternative.getConfidence());
+//                System.out.printf("Transcription: %s%n", alternative.getTranscript());
+//            }
         }
+    }
+
+    private static void test(SpeechRecognitionResult result) {
+        SpeechRecognitionAlternative alternative = result.getAlternativesList().get(0);
+        System.out.printf("Confidence: %f%n", alternative.getConfidence());
+        System.out.printf("Transcription: %s%n", alternative.getTranscript());
     }
 }

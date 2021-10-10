@@ -32,6 +32,7 @@ public class WavSplitter {
 
         final SplitResultBuilder resultBuilder = new SplitResultBuilder();
 
+        //TODO: Optimized??
         for (SplitDescription description : descriptions) {
             int toSkip = roundToFrameSize(bytesPerSecond * description.range.startSecond, format.getFrameSize());
             //noinspection ResultOfMethodCallIgnored
