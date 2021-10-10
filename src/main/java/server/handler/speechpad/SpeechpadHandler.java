@@ -67,8 +67,6 @@ public class SpeechpadHandler {
         }
     }
 
-
-    //TODO: need realized methods to edit, delete and create new archive speech
     @Description("Изменить название архивной записи")
     @HandlePost("/remove")
     GenericResponse remove(
