@@ -59,4 +59,14 @@ public class SpeechpadHandler {
         }
     }
 
+    @Description("Получение голосового блокнота по идентификатору")
+    @HandlePost("/get")
+    SpeechpadCreateResponse get(
+        @Query("speechpad_id") String speechpadId
+    ) throws NoSuchSpeechpadException {
+        logger.info("Handle speechpad create");
+        Speechpad speechpad = speechpadManager.getSpeechpad(speechpadId);
+        return new SpeechpadCreateResponse(speechpad.getId());
+    }
+
 }
