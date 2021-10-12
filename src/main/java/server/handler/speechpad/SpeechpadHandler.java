@@ -64,7 +64,7 @@ public class SpeechpadHandler {
     SpeechpadCreateResponse get(
         @Query("speechpad_id") String speechpadId
     ) throws NoSuchSpeechpadException {
-        logger.info("Handle speechpad create");
+        logger.info("Handle get speechpad by id");
         Speechpad speechpad = speechpadManager.getSpeechpad(speechpadId);
         return new SpeechpadCreateResponse(speechpad.getId());
     }
