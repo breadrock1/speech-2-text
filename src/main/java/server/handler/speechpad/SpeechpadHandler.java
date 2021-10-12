@@ -38,7 +38,9 @@ public class SpeechpadHandler {
 
     @Description("Создание голосового блокнота")
     @HandlePost("/create")
-    SpeechpadCreateResponse create(@Query("model") String model) {
+    SpeechpadCreateResponse create(
+        @Query("model") String model
+    ) {
         logger.info("Handle speechpad create");
         Speechpad speechpad = speechpadManager.create(model);
         return new SpeechpadCreateResponse(speechpad.getId());
@@ -49,7 +51,7 @@ public class SpeechpadHandler {
     GenericResponse remove(
         @Query("speechpad_id") String speechpadId
     ) throws NoSuchSpeechpadException {
-        logger.info("Handle speechpad create");
+        logger.info("Handle speechpad remove");
         boolean status = speechpadManager.delete(speechpadId);
         return new GenericResponse(status);
     }
