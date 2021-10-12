@@ -46,7 +46,7 @@ public class SpeechpadHandler {
     ) {
         logger.info("Handle create speechpad");
         Speechpad speechpad = speechpadManager.create(model);
-        return new SpeechpadCreateResponse(speechpad.getId());
+        return new SpeechpadCreateResponse(speechpad.getId(), speechpad.getName());
     }
 
     @Description("Удаление голосового блокнота")
@@ -55,8 +55,12 @@ public class SpeechpadHandler {
         @Query("speechpad_id") String speechpadId
     ) throws NoSuchSpeechpadException {
         logger.info("Handle remove speechpad");
-        boolean status = speechpadManager.delete(speechpadId);
-        return new GenericResponse(status);
+        try {
+            speechpadManager.delete(speechpadId);
+            return new GenericResponse(true);
+        } catch (NoSuchSpeechpadException e) {
+            throw new NoSuchSpeechpadException(speechpadId);
+        }
     }
 
     @Description("Изменить название архивной записи")
@@ -65,8 +69,8 @@ public class SpeechpadHandler {
         @Query("speechpad_id") String speechpadId,
         @Query("new_name") String newName
     ) throws NoSuchSpeechpadException {
+        logger.info("Handle speechpad rename");
         try {
-            logger.info("Handle speechpad rename");
             speechpadManager.rename(speechpadId, newName);
             return new SpeechpadRenameResponse(speechpadId, newName);
         } catch (NoSuchSpeechpadException e) {
@@ -97,7 +101,7 @@ public class SpeechpadHandler {
     ) throws NoSuchSpeechpadException {
         logger.info("Handle get speechpad by id");
         Speechpad speechpad = speechpadManager.getSpeechpad(speechpadId);
-        return new SpeechpadCreateResponse(speechpad.getId());
+        return new SpeechpadCreateResponse(speechpad.getId(), speechpad.getName());
     }
 
     @Description("Получение голосового блокнота по идентификатору")

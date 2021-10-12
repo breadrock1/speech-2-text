@@ -22,13 +22,12 @@ public class SpeechpadManager {
         return speechpad;
     }
 
-    public boolean delete(String speechpadId) {
+    public void delete(String speechpadId) throws NoSuchSpeechpadException {
         synchronized (speechpadMap) {
             if (!speechpadMap.containsKey(speechpadId)) {
-                return false;
+                throw new NoSuchSpeechpadException(speechpadId);
             }
             speechpadMap.remove(speechpadId);
-            return true;
         }
     }
 
