@@ -9,6 +9,7 @@ import server.http.annotation.SummaryHttpHandler;
 import server.localization.CurrentLocale;
 import server.localization.StringId;
 import server.logging.Logger;
+import server.response.GenericResponse;
 import server.response.speechpad.SpeechpadChunkResponse;
 import server.response.speechpad.SpeechpadCreateResponse;
 import server.response.transcribe.TranscribeResult;
@@ -41,6 +42,16 @@ public class SpeechpadHandler {
         logger.info("Handle speechpad create");
         Speechpad speechpad = speechpadManager.create(model);
         return new SpeechpadCreateResponse(speechpad.getId());
+    }
+
+    @Description("Удаление голосового блокнота")
+    @HandlePost("/remove")
+    GenericResponse remove(
+        @Query("speechpad_id") String speechpadId
+    ) throws NoSuchSpeechpadException {
+        logger.info("Handle speechpad create");
+        boolean status = speechpadManager.delete(speechpadId);
+        return new GenericResponse(status);
     }
 
     @Description("Отправка порции аудио")

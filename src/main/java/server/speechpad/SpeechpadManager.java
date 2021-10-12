@@ -19,6 +19,16 @@ public class SpeechpadManager {
         return speechpad;
     }
 
+    public boolean delete(String speechpadId) {
+        synchronized (speechpadMap) {
+            if (!speechpadMap.containsKey(speechpadId)) {
+                return false;
+            }
+            speechpadMap.remove(speechpadId);
+            return true;
+        }
+    }
+
     public Speechpad getSpeechpad(String speechpadId) throws NoSuchSpeechpadException {
         Speechpad speechpad;
         synchronized (speechpadMap) {
