@@ -41,7 +41,7 @@ public class SpeechpadHandler {
     SpeechpadCreateResponse create(
         @Query("model") String model
     ) {
-        logger.info("Handle speechpad create");
+        logger.info("Handle create speechpad");
         Speechpad speechpad = speechpadManager.create(model);
         return new SpeechpadCreateResponse(speechpad.getId());
     }
@@ -51,7 +51,7 @@ public class SpeechpadHandler {
     GenericResponse remove(
         @Query("speechpad_id") String speechpadId
     ) throws NoSuchSpeechpadException {
-        logger.info("Handle speechpad remove");
+        logger.info("Handle remove speechpad");
         boolean status = speechpadManager.delete(speechpadId);
         return new GenericResponse(status);
     }
