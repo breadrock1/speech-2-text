@@ -13,9 +13,10 @@ public class SpeechpadManager {
 
     private final Map<String, Speechpad> speechpadMap = new HashMap<>();
 
-    public Speechpad create(String model) {
+    public Speechpad create(String model, String name) {
         String speechpadId = UUID.randomUUID().toString();
-        Speechpad speechpad = new Speechpad(speechpadId, new RealtimeTranscriber(model));
+        String speechpadName = (name == null) ? speechpadId : name;
+        Speechpad speechpad = new Speechpad(speechpadId, speechpadName, new RealtimeTranscriber(model));
         synchronized (speechpadMap) {
             speechpadMap.put(speechpadId, speechpad);
         }

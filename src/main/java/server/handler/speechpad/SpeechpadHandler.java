@@ -42,10 +42,11 @@ public class SpeechpadHandler {
     @Description("Создание голосового блокнота")
     @HandlePost("/create")
     SpeechpadCreateResponse create(
-        @Query("model") String model
+        @Query("model") String model,
+        @Query("name") String name
     ) {
         logger.info("Handle create speechpad");
-        Speechpad speechpad = speechpadManager.create(model);
+        Speechpad speechpad = speechpadManager.create(model, name);
         return new SpeechpadCreateResponse(speechpad.getId(), speechpad.getName());
     }
 

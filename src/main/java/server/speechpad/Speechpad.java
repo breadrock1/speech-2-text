@@ -12,9 +12,9 @@ public class Speechpad {
     private final String id;
     private final RealtimeTranscriber transcriber;
 
-    public Speechpad(String id, RealtimeTranscriber transcriber) {
+    public Speechpad(String id, String name, RealtimeTranscriber transcriber) {
         this.id = id;
-        this.name = id;
+        this.name = name;
         this.transcriber = transcriber;
     }
 
