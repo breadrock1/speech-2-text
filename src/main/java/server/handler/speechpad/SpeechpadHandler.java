@@ -3,6 +3,7 @@ package server.handler.speechpad;
 import doc.annotation.Description;
 import server.handler.HandlerException;
 import server.http.annotation.Body;
+import server.http.annotation.HandleGet;
 import server.http.annotation.HandlePost;
 import server.http.annotation.Query;
 import server.http.annotation.SummaryHttpHandler;
@@ -73,7 +74,7 @@ public class SpeechpadHandler {
     }
 
     @Description("Получение голосового блокнота по идентификатору")
-    @HandlePost("/get")
+    @HandleGet("/get")
     SpeechpadCreateResponse get(
         @Query("speechpad_id") String speechpadId
     ) throws NoSuchSpeechpadException {
