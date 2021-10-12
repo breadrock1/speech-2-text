@@ -8,7 +8,7 @@ import java.util.List;
 
 public class SpeechpadGetAllResponse extends GenericResponse {
 
-    private List<Speechpad> speechpads = new ArrayList<>();
+    private final List<Speechpad> speechpads;
 
     public SpeechpadGetAllResponse(List<Speechpad> speechpads) {
         this.speechpads = speechpads;

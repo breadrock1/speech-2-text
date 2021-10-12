@@ -40,7 +40,7 @@ public class SpeechpadManager {
     public Speechpad getSpeechpad(String speechpadId) throws NoSuchSpeechpadException {
         Speechpad speechpad;
         synchronized (speechpadMap) {
-            speechpad = speechpadMap.get(speechpadId);
+            speechpad = speechpadMap.getOrDefault(speechpadId, null);
         }
         if (speechpad == null) {
             throw new NoSuchSpeechpadException(speechpadId);
