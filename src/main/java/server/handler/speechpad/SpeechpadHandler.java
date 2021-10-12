@@ -13,6 +13,7 @@ import server.logging.Logger;
 import server.response.GenericResponse;
 import server.response.speechpad.SpeechpadChunkResponse;
 import server.response.speechpad.SpeechpadCreateResponse;
+import server.response.speechpad.SpeechpadGetAllResponse;
 import server.response.transcribe.TranscribeResult;
 import server.speechpad.NoSuchSpeechpadException;
 import server.speechpad.Speechpad;
@@ -81,6 +82,14 @@ public class SpeechpadHandler {
         logger.info("Handle get speechpad by id");
         Speechpad speechpad = speechpadManager.getSpeechpad(speechpadId);
         return new SpeechpadCreateResponse(speechpad.getId());
+    }
+
+    @Description("Получение голосового блокнота по идентификатору")
+    @HandleGet("/getAll")
+    SpeechpadGetAllResponse getAll() {
+        logger.info("Handle get all speechpad archives");
+        List<Speechpad> allSpeechpad = speechpadManager.getAllSpeechpads();
+        return new SpeechpadGetAllResponse(allSpeechpad);
     }
 
 }

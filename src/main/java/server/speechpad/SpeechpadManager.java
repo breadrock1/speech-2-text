@@ -1,5 +1,7 @@
 package server.speechpad;
 
+import java.util.ArrayList;
+import java.util.List;
 import server.realtime_transcribe.RealtimeTranscriber;
 
 import java.util.HashMap;
@@ -26,6 +28,12 @@ public class SpeechpadManager {
             }
             speechpadMap.remove(speechpadId);
             return true;
+        }
+    }
+
+    public List<Speechpad> getAllSpeechpads() {
+        synchronized (speechpadMap) {
+            return new ArrayList<>(speechpadMap.values());
         }
     }
 
