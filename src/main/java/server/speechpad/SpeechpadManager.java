@@ -2,6 +2,7 @@ package server.speechpad;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import server.realtime_transcribe.RealtimeTranscriber;
 
 import java.util.HashMap;
@@ -28,6 +29,14 @@ public class SpeechpadManager {
             }
             speechpadMap.remove(speechpadId);
             return true;
+        }
+    }
+
+    public void rename(String speechpadId, String newName) throws NoSuchSpeechpadException {
+        synchronized (speechpadMap) {
+            Optional.ofNullable(speechpadMap.get(speechpadId))
+                .orElseThrow(() -> new NoSuchSpeechpadException(speechpadId))
+                .setName(newName);
         }
     }
 

@@ -14,6 +14,7 @@ import server.response.GenericResponse;
 import server.response.speechpad.SpeechpadChunkResponse;
 import server.response.speechpad.SpeechpadCreateResponse;
 import server.response.speechpad.SpeechpadGetAllResponse;
+import server.response.speechpad.SpeechpadRenameResponse;
 import server.response.transcribe.TranscribeResult;
 import server.speechpad.NoSuchSpeechpadException;
 import server.speechpad.Speechpad;
@@ -56,6 +57,21 @@ public class SpeechpadHandler {
         logger.info("Handle remove speechpad");
         boolean status = speechpadManager.delete(speechpadId);
         return new GenericResponse(status);
+    }
+
+    @Description("Изменить название архивной записи")
+    @HandlePost("/rename")
+    SpeechpadRenameResponse rename(
+        @Query("speechpad_id") String speechpadId,
+        @Query("new_name") String newName
+    ) throws NoSuchSpeechpadException {
+        try {
+            logger.info("Handle speechpad rename");
+            speechpadManager.rename(speechpadId, newName);
+            return new SpeechpadRenameResponse(speechpadId, newName);
+        } catch (NoSuchSpeechpadException e) {
+            throw new NoSuchSpeechpadException(speechpadId);
+        }
     }
 
     @Description("Отправка порции аудио")

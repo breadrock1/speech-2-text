@@ -8,16 +8,26 @@ import java.util.List;
 
 public class Speechpad {
 
+    private String name;
     private final String id;
     private final RealtimeTranscriber transcriber;
 
     public Speechpad(String id, RealtimeTranscriber transcriber) {
         this.id = id;
+        this.name = id;
         this.transcriber = transcriber;
     }
 
     public String getId() {
         return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public List<TranscribeResult> append(byte[] body) throws IOException {
