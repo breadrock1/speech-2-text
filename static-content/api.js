@@ -140,7 +140,7 @@ function SpeechpadApi() {
                 callback(JSON.parse(this.responseText))
             }
         }
-        request.open("POST", `${apiUrl}/1/speechpad/create?model=${model}?name=${name}`, true)
+        request.open("POST", `${apiUrl}/1/speechpad/create?model=${model}&name=${name}`, true)
         request.setRequestHeader("Authorization", "Bearer " + localStorage.getItem('access-token'))
         request.send("")
     }
