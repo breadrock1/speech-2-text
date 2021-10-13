@@ -40,7 +40,6 @@ public class Speechpad {
     }
 
     public List<TranscribeResult> update(TranscribeResult transcribeResult) {
-        transcriber.update(transcribeResult);
-        return transcriber.flushResult();
+        return transcriber.update(transcribeResult);
     }
 }
