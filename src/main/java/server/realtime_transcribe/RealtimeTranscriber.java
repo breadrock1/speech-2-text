@@ -121,7 +121,12 @@ public class RealtimeTranscriber {
 
         @Override
         public void onResponse(final StreamingRecognizeResponse response) {
-            StreamingRecognitionResult result = response.getResultsList().get(0);
+            StreamingRecognitionResult result = null;
+            try {
+                result = response.getResultsList().get(0);
+            } catch (IndexOutOfBoundsException e) {
+                return;
+            }
             synchronized (transcribeResults) {
                 transcribeResults.add(new TranscribeResult(result));
             }
