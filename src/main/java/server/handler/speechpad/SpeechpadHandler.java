@@ -1,7 +1,7 @@
 package server.handler.speechpad;
 
+import com.google.protobuf.ByteString;
 import doc.annotation.Description;
-import retrofit2.http.PUT;
 import server.handler.HandlerException;
 import server.http.annotation.Body;
 import server.http.annotation.HandleGet;
@@ -106,16 +106,32 @@ public class SpeechpadHandler {
         return new SpeechpadCreateResponse(speechpad.getId(), speechpad.getName());
     }
 
+    @Description("Получить транскрипцию голосового блокнота по идентификатору")
+    @HandleGet("/result")
+    SpeechpadChunkResponse result(
+        @Query("speechpad_id") String speechpadId
+    ) throws NoSuchSpeechpadException {
+        logger.info("Handle get transcribe result by id");
+        try {
+            Speechpad speechpad = speechpadManager.getSpeechpad(speechpadId);
+            List<TranscribeResult> result = speechpad.getTranscribe();
+            return new SpeechpadChunkResponse(result);
+        } catch (NoSuchSpeechpadException e) {
+            throw new NoSuchSpeechpadException(speechpadId);
+        }
+    }
+
     @Description("Изменение транскрипции голосового блокнота по идентификатору")
     @HandlePost("/edit")
     SpeechpadChunkResponse edit(
         @Query("speechpad_id") String speechpadId,
-        @Body String body
+        @Body byte[] body
     ) throws NoSuchSpeechpadException {
         logger.info("Handle get speechpad by id");
         try {
             Speechpad speechpad = speechpadManager.getSpeechpad(speechpadId);
-            TranscribeResult transcribeResult = new TranscribeResult(body);
+            String data = ByteString.copyFrom(body).toString();
+            TranscribeResult transcribeResult = new TranscribeResult(data);
             List<TranscribeResult> result = speechpad.update(transcribeResult);
             return new SpeechpadChunkResponse(result);
         } catch (NoSuchSpeechpadException e) {
@@ -123,7 +139,7 @@ public class SpeechpadHandler {
         }
     }
 
-    @Description("Получение голосового блокнота по идентификатору")
+    @Description("Получение всех голосовых блокнотов")
     @HandleGet("/getAll")
     SpeechpadGetAllResponse getAll() {
         logger.info("Handle get all speechpad archives");

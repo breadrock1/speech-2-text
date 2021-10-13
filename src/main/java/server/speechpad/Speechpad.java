@@ -30,6 +30,10 @@ public class Speechpad {
         this.name = name;
     }
 
+    public List<TranscribeResult> getTranscribe() {
+        return transcriber.flushResult();
+    }
+
     public List<TranscribeResult> append(byte[] body) throws IOException {
         transcriber.append(body);
         return transcriber.flushResult();
