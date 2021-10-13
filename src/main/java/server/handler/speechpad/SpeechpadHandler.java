@@ -1,6 +1,5 @@
 package server.handler.speechpad;
 
-import com.google.protobuf.ByteString;
 import doc.annotation.Description;
 import server.handler.HandlerException;
 import server.http.annotation.Body;
@@ -112,9 +111,11 @@ public class SpeechpadHandler {
 
     @Description("Получение всех голосовых блокнотов")
     @HandleGet("/getAll")
-    SpeechpadGetAllResponse getAll() {
+    SpeechpadCreateResponse getAll() {
         logger.info("Handle get all speechpad archives");
-        return new SpeechpadGetAllResponse(speechpadManager.getAllSpeechpads());
+        List<Speechpad> speechpads = speechpadManager.getAllSpeechpads();
+        //return new SpeechpadGetAllResponse(speechpadManager.getAllSpeechpads());
+        return new SpeechpadCreateResponse(speechpads.get(0).getId(), speechpads.get(0).getName());
     }
 
     @Description("Получить транскрипцию голосового блокнота")
