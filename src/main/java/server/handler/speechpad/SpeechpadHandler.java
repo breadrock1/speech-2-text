@@ -65,16 +65,17 @@ public class SpeechpadHandler {
         }
     }
 
-    @Description("Изменить название архивной записи")
+    @Description("Переименование голосового блокнота")
     @HandlePost("/rename")
     SpeechpadRenameResponse rename(
         @Query("speechpad_id") String speechpadId,
         @Query("new_name") String newName
     ) throws NoSuchSpeechpadException {
-        logger.info("Handle speechpad rename");
+        logger.info("Handle rename speechpad");
         try {
-            speechpadManager.rename(speechpadId, newName);
-            return new SpeechpadRenameResponse(speechpadId, newName);
+            Speechpad speechpad = speechpadManager.getSpeechpad(speechpadId);
+            speechpad.setName(newName);
+            return new SpeechpadRenameResponse(speechpad.getId(), speechpad.getName());
         } catch (NoSuchSpeechpadException e) {
             throw new NoSuchSpeechpadException(speechpadId);
         }
@@ -89,8 +90,7 @@ public class SpeechpadHandler {
         logger.info("Handle speechpad chunk");
         try {
             Speechpad speechpad = speechpadManager.getSpeechpad(speechpadId);
-            List<TranscribeResult> result = speechpad.append(body);
-            return new SpeechpadChunkResponse(result);
+            return new SpeechpadChunkResponse(speechpad.append(body));
         } catch (NoSuchSpeechpadException e) {
             throw new HandlerException(200, errorResponse(StringId.SPEECHPAD_NOT_EXIST, locale));
         }
@@ -102,38 +102,9 @@ public class SpeechpadHandler {
         @Query("speechpad_id") String speechpadId
     ) throws NoSuchSpeechpadException {
         logger.info("Handle get speechpad by id");
-        Speechpad speechpad = speechpadManager.getSpeechpad(speechpadId);
-        return new SpeechpadCreateResponse(speechpad.getId(), speechpad.getName());
-    }
-
-    @Description("Получить транскрипцию голосового блокнота по идентификатору")
-    @HandleGet("/result")
-    SpeechpadChunkResponse result(
-        @Query("speechpad_id") String speechpadId
-    ) throws NoSuchSpeechpadException {
-        logger.info("Handle get transcribe result by id");
         try {
             Speechpad speechpad = speechpadManager.getSpeechpad(speechpadId);
-            List<TranscribeResult> result = speechpad.getTranscribe();
-            return new SpeechpadChunkResponse(result);
-        } catch (NoSuchSpeechpadException e) {
-            throw new NoSuchSpeechpadException(speechpadId);
-        }
-    }
-
-    @Description("Изменение транскрипции голосового блокнота по идентификатору")
-    @HandlePost("/edit")
-    SpeechpadChunkResponse edit(
-        @Query("speechpad_id") String speechpadId,
-        @Body byte[] body
-    ) throws NoSuchSpeechpadException {
-        logger.info("Handle get speechpad by id");
-        try {
-            Speechpad speechpad = speechpadManager.getSpeechpad(speechpadId);
-            String data = ByteString.copyFrom(body).toString();
-            TranscribeResult transcribeResult = new TranscribeResult(data);
-            List<TranscribeResult> result = speechpad.update(transcribeResult);
-            return new SpeechpadChunkResponse(result);
+            return new SpeechpadCreateResponse(speechpad.getId(), speechpad.getName());
         } catch (NoSuchSpeechpadException e) {
             throw new NoSuchSpeechpadException(speechpadId);
         }
@@ -143,8 +114,37 @@ public class SpeechpadHandler {
     @HandleGet("/getAll")
     SpeechpadGetAllResponse getAll() {
         logger.info("Handle get all speechpad archives");
-        List<Speechpad> allSpeechpad = speechpadManager.getAllSpeechpads();
-        return new SpeechpadGetAllResponse(allSpeechpad);
+        return new SpeechpadGetAllResponse(speechpadManager.getAllSpeechpads());
+    }
+
+    @Description("Получить транскрипцию голосового блокнота")
+    @HandleGet("/result")
+    SpeechpadChunkResponse result(
+        @Query("speechpad_id") String speechpadId
+    ) throws NoSuchSpeechpadException {
+        logger.info("Handle get transcribe result by id");
+        try {
+            Speechpad speechpad = speechpadManager.getSpeechpad(speechpadId);
+            return new SpeechpadChunkResponse(speechpad.getTranscribe());
+        } catch (NoSuchSpeechpadException e) {
+            throw new NoSuchSpeechpadException(speechpadId);
+        }
+    }
+
+    @Description("Изменение транскрипции голосового блокнота")
+    @HandlePost("/edit")
+    SpeechpadChunkResponse edit(
+        @Query("speechpad_id") String speechpadId,
+        @Query("transcribe") String data
+    ) throws NoSuchSpeechpadException {
+        logger.info("Handle edit speechpad transcribe");
+        try {
+            Speechpad speechpad = speechpadManager.getSpeechpad(speechpadId);
+            List<TranscribeResult> result = speechpad.update(new TranscribeResult(data));
+            return new SpeechpadChunkResponse(result);
+        } catch (NoSuchSpeechpadException e) {
+            throw new NoSuchSpeechpadException(speechpadId);
+        }
     }
 
 }

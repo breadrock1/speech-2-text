@@ -30,7 +30,7 @@ public class RealtimeTranscriber {
     private Observer responseObserver;
     private ClientStream<StreamingRecognizeRequest> clientStream;
 
-    private List<TranscribeResult> transcribeResults = new ArrayList<>();
+    private final List<TranscribeResult> transcribeResults = new ArrayList<>();
     private final Logger logger = LoggerFactory.createFor(RealtimeTranscriber.class);
 
     public RealtimeTranscriber(String model) {
@@ -46,10 +46,11 @@ public class RealtimeTranscriber {
         clientStream.send(request);
     }
 
-    public synchronized List<TranscribeResult> update(TranscribeResult transcribeResult) {
-        this.transcribeResults.clear();
-        this.transcribeResults = Collections.singletonList(transcribeResult);
-
+    public List<TranscribeResult> update(TranscribeResult transcribeResult) {
+        synchronized (transcribeResults) {
+            this.transcribeResults.clear();
+            this.transcribeResults.addAll(Collections.singletonList(transcribeResult));
+        }
         return transcribeResults;
     }
 
