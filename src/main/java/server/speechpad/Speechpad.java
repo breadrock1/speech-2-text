@@ -34,4 +34,9 @@ public class Speechpad {
         transcriber.append(body);
         return transcriber.flushResult();
     }
+
+    public List<TranscribeResult> update(TranscribeResult transcribeResult) {
+        transcriber.update(transcribeResult);
+        return transcriber.flushResult();
+    }
 }

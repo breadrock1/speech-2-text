@@ -10,6 +10,8 @@ import com.google.cloud.speech.v1.StreamingRecognitionResult;
 import com.google.cloud.speech.v1.StreamingRecognizeRequest;
 import com.google.cloud.speech.v1.StreamingRecognizeResponse;
 import com.google.protobuf.ByteString;
+import java.util.Arrays;
+import java.util.Collections;
 import server.logging.Logger;
 import server.logging.LoggerFactory;
 import server.response.transcribe.TranscribeResult;
@@ -28,7 +30,7 @@ public class RealtimeTranscriber {
     private Observer responseObserver;
     private ClientStream<StreamingRecognizeRequest> clientStream;
 
-    private final List<TranscribeResult> transcribeResults = new ArrayList<>();
+    private List<TranscribeResult> transcribeResults = new ArrayList<>();
     private final Logger logger = LoggerFactory.createFor(RealtimeTranscriber.class);
 
     public RealtimeTranscriber(String model) {
@@ -42,6 +44,13 @@ public class RealtimeTranscriber {
                 .setAudioContent(ByteString.copyFrom(data))
                 .build();
         clientStream.send(request);
+    }
+
+    public synchronized List<TranscribeResult> update(TranscribeResult transcribeResult) {
+        this.transcribeResults.clear();
+        this.transcribeResults = Collections.singletonList(transcribeResult);
+
+        return transcribeResults;
     }
 
     public List<TranscribeResult> flushResult() {

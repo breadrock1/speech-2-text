@@ -1,6 +1,7 @@
 package server.handler.speechpad;
 
 import doc.annotation.Description;
+import retrofit2.http.PUT;
 import server.handler.HandlerException;
 import server.http.annotation.Body;
 import server.http.annotation.HandleGet;
@@ -103,6 +104,23 @@ public class SpeechpadHandler {
         logger.info("Handle get speechpad by id");
         Speechpad speechpad = speechpadManager.getSpeechpad(speechpadId);
         return new SpeechpadCreateResponse(speechpad.getId(), speechpad.getName());
+    }
+
+    @Description("Изменение транскрипции голосового блокнота по идентификатору")
+    @HandlePost("/edit")
+    SpeechpadChunkResponse edit(
+        @Query("speechpad_id") String speechpadId,
+        @Body String body
+    ) throws NoSuchSpeechpadException {
+        logger.info("Handle get speechpad by id");
+        try {
+            Speechpad speechpad = speechpadManager.getSpeechpad(speechpadId);
+            TranscribeResult transcribeResult = new TranscribeResult(body);
+            List<TranscribeResult> result = speechpad.update(transcribeResult);
+            return new SpeechpadChunkResponse(result);
+        } catch (NoSuchSpeechpadException e) {
+            throw new NoSuchSpeechpadException(speechpadId);
+        }
     }
 
     @Description("Получение голосового блокнота по идентификатору")
