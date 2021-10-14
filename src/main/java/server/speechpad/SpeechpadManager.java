@@ -31,16 +31,8 @@ public class SpeechpadManager {
         }
     }
 
-    public List<Speechpad> getAllSpeechpads() {
-        synchronized (speechpadMap) {
-            return new ArrayList<>(speechpadMap.values());
-        }
-    }
-
-    public Map<String, Speechpad> getSpeechpadMap() {
-        synchronized (speechpadMap) {
-            return speechpadMap;
-        }
+    public synchronized List<Speechpad> getAllSpeechpads() {
+        return new ArrayList<>(speechpadMap.values());
     }
 
     public Speechpad getSpeechpad(String speechpadId) throws NoSuchSpeechpadException {
