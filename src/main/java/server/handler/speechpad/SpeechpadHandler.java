@@ -111,7 +111,7 @@ public class SpeechpadHandler {
 
     @Description("Получение всех голосовых блокнотов")
     @HandleGet("/getAll")
-    SpeechpadCreateResponse getAll() {
+    SpeechpadGetAllResponse getAll() {
         logger.info("Handle get all speechpad archives");
         List<Speechpad> speechpads = speechpadManager.getAllSpeechpads();
         return new SpeechpadGetAllResponse(speechpadManager.getAllSpeechpads());
