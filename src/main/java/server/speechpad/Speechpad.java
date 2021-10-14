@@ -22,8 +22,16 @@ public class Speechpad {
         return id;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public void setName(String name) {
         this.name = name;
+    }
+
+    public List<TranscribeResult> getTranscribe() {
+        return transcriber.flushResult();
     }
 
     public List<TranscribeResult> append(byte[] body) throws IOException {
@@ -31,8 +39,7 @@ public class Speechpad {
         return transcriber.flushResult();
     }
 
-    public List<TranscribeResult> setEditedResult(TranscribeResult result) {
-        transcriber.setEditedResult(result);
-        return transcriber.flushResult();
+    public List<TranscribeResult> update(TranscribeResult transcribeResult) {
+        return transcriber.update(transcribeResult);
     }
 }

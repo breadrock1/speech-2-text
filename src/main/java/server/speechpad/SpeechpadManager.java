@@ -1,13 +1,11 @@
 package server.speechpad;
 
-import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 import server.realtime_transcribe.RealtimeTranscriber;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 public class SpeechpadManager {
@@ -24,39 +22,30 @@ public class SpeechpadManager {
         return speechpad;
     }
 
-    public List<Speechpad> getAllSpeechpad() {
-        Collection<Speechpad> speechpadCollection;
+    public void delete(String speechpadId) throws NoSuchSpeechpadException {
         synchronized (speechpadMap) {
-            speechpadCollection = speechpadMap.values();
+            if (!speechpadMap.containsKey(speechpadId)) {
+                throw new NoSuchSpeechpadException(speechpadId);
+            }
+            speechpadMap.remove(speechpadId);
         }
-        return new ArrayList<>(speechpadCollection);
+    }
+
+    public synchronized List<String> getAllSpeechpads() {
+        return speechpadMap.values()
+            .stream()
+            .map(Speechpad::getId)
+            .collect(Collectors.toList());
     }
 
     public Speechpad getSpeechpad(String speechpadId) throws NoSuchSpeechpadException {
         Speechpad speechpad;
         synchronized (speechpadMap) {
-            speechpad = speechpadMap.get(speechpadId);
+            speechpad = speechpadMap.getOrDefault(speechpadId, null);
         }
-        return Optional.ofNullable(speechpad)
-            .orElseThrow(() -> new NoSuchSpeechpadException(speechpadId));
-    }
-
-    public boolean delete(String speechpadId) {
-        synchronized (speechpadMap) {
-            if (!speechpadMap.containsKey(speechpadId)) {
-                return false;
-            }
-            speechpadMap.remove(speechpadId);
-            return true;
+        if (speechpad == null) {
+            throw new NoSuchSpeechpadException(speechpadId);
         }
+        return speechpad;
     }
-
-    public void rename(String speechpadId, String newName) throws NoSuchSpeechpadException {
-        synchronized (speechpadMap) {
-            Optional.ofNullable(speechpadMap.get(speechpadId))
-                .orElseThrow(() -> new NoSuchSpeechpadException(speechpadId))
-                .setName(newName);
-        }
-    }
-
 }

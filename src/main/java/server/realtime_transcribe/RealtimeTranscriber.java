@@ -10,6 +10,8 @@ import com.google.cloud.speech.v1.StreamingRecognitionResult;
 import com.google.cloud.speech.v1.StreamingRecognizeRequest;
 import com.google.cloud.speech.v1.StreamingRecognizeResponse;
 import com.google.protobuf.ByteString;
+import java.util.Arrays;
+import java.util.Collections;
 import server.logging.Logger;
 import server.logging.LoggerFactory;
 import server.response.transcribe.TranscribeResult;
@@ -44,9 +46,12 @@ public class RealtimeTranscriber {
         clientStream.send(request);
     }
 
-    public synchronized void setEditedResult(TranscribeResult result) {
-        this.transcribeResults.clear();
-        this.transcribeResults.add(result);
+    public List<TranscribeResult> update(TranscribeResult transcribeResult) {
+        synchronized (transcribeResults) {
+            this.transcribeResults.clear();
+            this.transcribeResults.addAll(Collections.singletonList(transcribeResult));
+        }
+        return transcribeResults;
     }
 
     public List<TranscribeResult> flushResult() {
@@ -103,11 +108,6 @@ public class RealtimeTranscriber {
                         .setStreamingConfig(streamingRecognitionConfig)
                         .build(); // The first request in a streaming call has to be a config
 
-//        FlacAudioFileReader mp= new FlacAudioFileReader();
-//        AudioInputStream in=mp.getAudioInputStream(new URL(url));
-//        AudioFormat targetFormat = new AudioFormat(16000, 16, 1, true, false);
-//        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(targetFormat, in);
-
         clientStream.send(request);
 
         ready = true;
@@ -121,7 +121,12 @@ public class RealtimeTranscriber {
 
         @Override
         public void onResponse(final StreamingRecognizeResponse response) {
-            StreamingRecognitionResult result = response.getResultsList().get(0);
+            StreamingRecognitionResult result = null;
+            try {
+                result = response.getResultsList().get(0);
+            } catch (IndexOutOfBoundsException e) {
+                return;
+            }
             synchronized (transcribeResults) {
                 transcribeResults.add(new TranscribeResult(result));
             }

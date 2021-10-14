@@ -6,6 +6,8 @@
 <script src="/api.js"></script>
 
 <button id="btn-start">Начать запись</button>
+<label for="name">name</label>
+<textarea id="name" style="width: 5%; height: 3%"></textarea>
 <select id="model">
     <option value="command_and_search">command_and_search</option>
     <option value="phone_call">phone_call</option>
@@ -27,6 +29,7 @@
 
     const output = document.getElementById('output')
     const model = document.getElementById('model')
+    const name = document.getElementById('name')
     const startBtn = document.getElementById('btn-start')
     const finishBtn = document.getElementById('btn-finish')
     finishBtn.disabled = true
@@ -34,7 +37,7 @@
     startBtn.onclick = function() {
         this.disabled = true;
         model.disabled = true
-        speechpadApi.create(model.value, function(response) {
+        speechpadApi.create(model.value, name.value, function(response) {
             speechpadId = response.speechpadId
             finishBtn.disabled = false
             summary.startRecording(chunkCallback)

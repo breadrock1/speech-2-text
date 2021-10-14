@@ -5,10 +5,10 @@ import server.response.GenericResponse;
 public class SpeechpadCreateResponse extends GenericResponse {
 
     private final String speechpadId;
-    private final String speechPadName;
+    private final String speechpadName;
 
-    public SpeechpadCreateResponse(String speechpadId, String speechPadName) {
+    public SpeechpadCreateResponse(String speechpadId, String speechpadName) {
         this.speechpadId = speechpadId;
-        this.speechPadName = speechPadName;
+        this.speechpadName = speechpadName;
     }
 }
