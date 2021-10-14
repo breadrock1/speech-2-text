@@ -25,7 +25,10 @@ public class AuthHttpRequestVerifier implements RequestVerifier {
         }
     }
 
-    static AccessToken checkAuthorization(AccessTokenManager accessTokenManager, Request request) throws VerificationException {
+    static AccessToken checkAuthorization(
+            AccessTokenManager accessTokenManager,
+            Request request
+    ) throws VerificationException {
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || authHeader.isEmpty()) {
             throw new VerificationException(401, new NonLocalizedErrorResponse("No Authorization header provided"));

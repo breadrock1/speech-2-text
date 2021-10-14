@@ -4,8 +4,8 @@ public class TranscriptionInput {
 
     public static final String NO_URL = "NO_URL";
 
-    private final TranscriptionConfig config;
     private final String audioUrl;
+    private final TranscriptionConfig config;
 
     public TranscriptionInput(TranscriptionConfig config) {
         this(config, NO_URL);

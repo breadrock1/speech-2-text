@@ -1,0 +1,525 @@
+<style>table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+  padding: 4px 8px 4px 8px;
+}</style>
+<h1>Summary API</h1>
+<a href='#group0'>Авторизация и пользователь</a><br/>
+<a href='#group1'>Расшифровка файлов</a><br/>
+<a href='#group2'>Конференции</a><br/>
+<a href='#group3'>Speechpad</a><br/>
+<h2 id='group0'>Авторизация и пользователь</h2>
+<h3>POST https://dpforge.com/1/user/create</h3>
+Описание: Создание пользователя<br/>
+Требуется авторизация: Нет<br/>
+<br/>
+Запрос: JSON, UserCreateRequest<br/>
+<br/>
+UserCreateRequest<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>login</td><td>string</td><td>Да</td><td></td></tr>
+<tr>
+<td>password</td><td>string</td><td>Да</td><td></td></tr>
+</table>
+<br/>
+Ответ: JSON AccessTokenResponse<br/>
+<br/>
+AccessTokenResponse<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>accessToken</td><td>string</td><td>Да</td><td></td></tr>
+<tr>
+<td>tokenType</td><td>string</td><td>Да</td><td></td></tr>
+</table>
+<br/>
+<h3>GET https://dpforge.com/1/user/current</h3>
+Описание: Получение текущего авторизованного пользователя<br/>
+Требуется авторизация: Да<br/>
+<br/>
+Ответ: JSON UserCurrentResponse<br/>
+<br/>
+UserCurrentResponse<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>login</td><td>string</td><td>Да</td><td></td></tr>
+</table>
+<br/>
+<h3>POST https://dpforge.com/1/user/login</h3>
+Описание: Логин<br/>
+Требуется авторизация: Нет<br/>
+<br/>
+Запрос: JSON, UserLoginRequest<br/>
+<br/>
+UserLoginRequest<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>login</td><td>string</td><td>Да</td><td></td></tr>
+<tr>
+<td>password</td><td>string</td><td>Да</td><td></td></tr>
+</table>
+<br/>
+Ответ: JSON AccessTokenResponse<br/>
+<br/>
+AccessTokenResponse<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>accessToken</td><td>string</td><td>Да</td><td></td></tr>
+<tr>
+<td>tokenType</td><td>string</td><td>Да</td><td></td></tr>
+</table>
+<br/>
+<h3>GET https://dpforge.com/1/user/settings/get</h3>
+Описание: Получение настройки по ключу<br/>
+Требуется авторизация: Да<br/>
+<br/>
+Query-параметры:<br/>
+<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>key</td><td>string</td><td>Да</td><td></td></tr>
+</table>
+<br/>
+Ответ: Plain text - произвольное содержимое, переданное ранее в set по тому же ключу. Пустая строка означает отсутствие значения.<br/>
+<br/>
+<h3>POST https://dpforge.com/1/user/settings/remove</h3>
+Описание: Удаление настройки по ключу<br/>
+Требуется авторизация: Да<br/>
+<br/>
+Query-параметры:<br/>
+<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>key</td><td>string</td><td>Да</td><td></td></tr>
+</table>
+<br/>
+Ответ: JSON GenericResponse<br/>
+<br/>
+GenericResponse<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>success</td><td>boolean</td><td>Да</td><td>true - успех, false - произошла ошибка</td></tr>
+</table>
+<br/>
+<h3>POST https://dpforge.com/1/user/settings/set</h3>
+Описание: Запись настройки по ключу<br/>
+Требуется авторизация: Да<br/>
+<br/>
+Query-параметры:<br/>
+<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>key</td><td>string</td><td>Да</td><td></td></tr>
+</table>
+<br/>
+Запрос: Plain text - произвольное содержимое, в том числе произвольный JSON<br/>
+<br/>
+Ответ: JSON GenericResponse<br/>
+<br/>
+GenericResponse<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>success</td><td>boolean</td><td>Да</td><td>true - успех, false - произошла ошибка</td></tr>
+</table>
+<br/>
+<h2 id='group1'>Расшифровка файлов</h2>
+<h3>GET https://dpforge.com/2/transcribe/check_state</h3>
+Описание: Проверка статуса расшифровки<br/>
+Требуется авторизация: Да<br/>
+<br/>
+Query-параметры:<br/>
+<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>transcribe_id</td><td>string</td><td>Да</td><td></td></tr>
+</table>
+<br/>
+Ответ: JSON TranscribeStateResponse<br/>
+<br/>
+TranscribeStateResponse<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>state</td><td>NOT_STARTED | IN_PROGRESS | READY</td><td>Да</td><td></td></tr>
+</table>
+<br/>
+<h3>POST https://dpforge.com/2/transcribe/edit</h3>
+Описание: Редактирование расшифровки<br/>
+Требуется авторизация: Да<br/>
+<br/>
+Query-параметры:<br/>
+<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>transcribe_id</td><td>string</td><td>Да</td><td></td></tr>
+</table>
+<br/>
+Запрос: JSON, TranscribeContent<br/>
+<br/>
+TranscribeContent<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>entries</td><td>Entry[]</td><td>Нет</td><td></td></tr>
+<tr>
+<td>errorText</td><td>string</td><td>Нет</td><td></td></tr>
+</table>
+<br/>
+Entry<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>time</td><td>integer</td><td>Да</td><td></td></tr>
+<tr>
+<td>speakerId</td><td>integer</td><td>Да</td><td></td></tr>
+<tr>
+<td>speakerTag</td><td>string</td><td>Да</td><td></td></tr>
+<tr>
+<td>text</td><td>string</td><td>Да</td><td></td></tr>
+</table>
+<br/>
+Ответ: JSON GenericResponse<br/>
+<br/>
+GenericResponse<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>success</td><td>boolean</td><td>Да</td><td>true - успех, false - произошла ошибка</td></tr>
+</table>
+<br/>
+<h3>POST https://dpforge.com/2/transcribe/generate_upload_url</h3>
+Описание: Создание ссылки для загрузки аудио больше 32 мегабайт<br/>
+Требуется авторизация: Да<br/>
+<br/>
+Query-параметры:<br/>
+<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>service</td><td>string</td><td>Да</td><td></td></tr>
+</table>
+<br/>
+Ответ: JSON TranscribeGenerateUploadUrlResponse<br/>
+<br/>
+TranscribeGenerateUploadUrlResponse<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>transcribeId</td><td>string</td><td>Да</td><td></td></tr>
+<tr>
+<td>url</td><td>string</td><td>Да</td><td></td></tr>
+</table>
+<br/>
+<h3>GET https://dpforge.com/2/transcribe/get</h3>
+Описание: Получение расшифровки<br/>
+Требуется авторизация: Да<br/>
+<br/>
+Query-параметры:<br/>
+<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>transcribe_id</td><td>string</td><td>Да</td><td></td></tr>
+</table>
+<br/>
+Ответ: JSON TranscribeGetResponse<br/>
+<br/>
+TranscribeGetResponse<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>audioUrl</td><td>string</td><td>Да</td><td>URL звукового файла для проигрывания</td></tr>
+<tr>
+<td>config</td><td>TranscriptionConfig</td><td>Да</td><td>Входные парметры</td></tr>
+<tr>
+<td>entries</td><td>Entry[]</td><td>Нет</td><td>Список элементов, если результат успешен</td></tr>
+<tr>
+<td>errorText</td><td>string</td><td>Нет</td><td>Текст ошибки, если результат неуспешен</td></tr>
+</table>
+<br/>
+TranscriptionConfig<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>service</td><td>string</td><td>Да</td><td></td></tr>
+<tr>
+<td>diarizationEnabled</td><td>boolean</td><td>Да</td><td></td></tr>
+<tr>
+<td>minSpeakerCount</td><td>integer</td><td>Да</td><td></td></tr>
+<tr>
+<td>maxSpeakerCount</td><td>integer</td><td>Да</td><td></td></tr>
+<tr>
+<td>model</td><td>string</td><td>Нет</td><td></td></tr>
+</table>
+<br/>
+Entry<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>time</td><td>integer</td><td>Да</td><td></td></tr>
+<tr>
+<td>speakerId</td><td>integer</td><td>Да</td><td></td></tr>
+<tr>
+<td>speakerTag</td><td>string</td><td>Да</td><td></td></tr>
+<tr>
+<td>text</td><td>string</td><td>Да</td><td></td></tr>
+</table>
+<br/>
+<h3>POST https://dpforge.com/2/transcribe/start</h3>
+Описание: Запуск процесса расшифровки<br/>
+Требуется авторизация: Да<br/>
+<br/>
+Query-параметры:<br/>
+<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>transcribe_id</td><td>string</td><td>Да</td><td></td></tr>
+<tr>
+<td>diarization_enabled</td><td>boolean</td><td>Нет</td><td></td></tr>
+<tr>
+<td>min_speaker_count</td><td>integer</td><td>Нет</td><td></td></tr>
+<tr>
+<td>max_speaker_count</td><td>integer</td><td>Нет</td><td></td></tr>
+<tr>
+<td>model</td><td>string</td><td>Нет</td><td>command_and_search, phone_call или default</td></tr>
+</table>
+<br/>
+Ответ: JSON TranscribeStartResponse<br/>
+<br/>
+TranscribeStartResponse<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>transcribeId</td><td>string</td><td>Да</td><td></td></tr>
+</table>
+<br/>
+<h3>POST https://dpforge.com/2/transcribe/upload</h3>
+Описание: Загрузка аудио до 32 мегабайт<br/>
+Требуется авторизация: Да<br/>
+<br/>
+Ответ: JSON TranscribeUploadResponse<br/>
+<br/>
+TranscribeUploadResponse<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>transcribeId</td><td>string</td><td>Да</td><td></td></tr>
+</table>
+<br/>
+<h2 id='group2'>Конференции</h2>
+<h3>POST https://dpforge.com/1/conference/chunk</h3>
+Описание: Отправка порции аудио участника<br/>
+Требуется авторизация: Да<br/>
+<br/>
+Query-параметры:<br/>
+<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>conference_id</td><td>string</td><td>Да</td><td></td></tr>
+<tr>
+<td>include_participants</td><td>boolean</td><td>Нет</td><td></td></tr>
+</table>
+<br/>
+Запрос: Raw binary<br/>
+<br/>
+Ответ: JSON ConferenceChunkResponse<br/>
+<br/>
+ConferenceChunkResponse<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>transcripts</td><td>ConferenceParticipantTranscript[]</td><td>Да</td><td></td></tr>
+<tr>
+<td>participants</td><td>ConferenceParticipant[]</td><td>Нет</td><td></td></tr>
+</table>
+<br/>
+ConferenceParticipantTranscript<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>participantId</td><td>string</td><td>Да</td><td></td></tr>
+<tr>
+<td>participantName</td><td>string</td><td>Да</td><td></td></tr>
+<tr>
+<td>isFinal</td><td>boolean</td><td>Да</td><td>true - результат финальный, false - промежуточный результат, который еще уточняется</td></tr>
+<tr>
+<td>value</td><td>string</td><td>Да</td><td>Реплика участника</td></tr>
+<tr>
+<td>confidence</td><td>float</td><td>Да</td><td>Уверенность в результате от 0 до 1</td></tr>
+</table>
+<br/>
+ConferenceParticipant<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>name</td><td>string</td><td>Да</td><td></td></tr>
+</table>
+<br/>
+<h3>POST https://dpforge.com/1/conference/create</h3>
+Описание: Создание конференции<br/>
+Требуется авторизация: Да<br/>
+<br/>
+Query-параметры:<br/>
+<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>conference_name</td><td>string</td><td>Да</td><td></td></tr>
+<tr>
+<td>host_name</td><td>string</td><td>Да</td><td></td></tr>
+</table>
+<br/>
+Ответ: JSON ConferenceCreateResponse<br/>
+<br/>
+ConferenceCreateResponse<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>conferenceId</td><td>string</td><td>Да</td><td></td></tr>
+<tr>
+<td>conferenceName</td><td>string</td><td>Да</td><td></td></tr>
+<tr>
+<td>hostId</td><td>string</td><td>Да</td><td>deprecated</td></tr>
+<tr>
+<td>hostName</td><td>string</td><td>Да</td><td></td></tr>
+</table>
+<br/>
+<h3>GET https://dpforge.com/1/conference/download</h3>
+Описание: Скачавание расшифровки конференции<br/>
+Требуется авторизация: Да<br/>
+<br/>
+Query-параметры:<br/>
+<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>conference_id</td><td>string</td><td>Да</td><td></td></tr>
+<tr>
+<td>format</td><td>string</td><td>Да</td><td>json или plaintext</td></tr>
+</table>
+<br/>
+Ответ: JSON ConferenceDownloadResponse - если format=json<br/>
+<br/>
+ConferenceDownloadResponse<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>text</td><td>string</td><td>Да</td><td></td></tr>
+<tr>
+<td>conferenceName</td><td>string</td><td>Да</td><td></td></tr>
+<tr>
+<td>entries</td><td>Entry[]</td><td>Да</td><td></td></tr>
+</table>
+<br/>
+Entry<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>participantName</td><td>string</td><td>Да</td><td></td></tr>
+<tr>
+<td>text</td><td>string</td><td>Да</td><td></td></tr>
+</table>
+<br/>
+Ответ: Plain text - если format=plaintext<br/>
+<br/>
+<h3>POST https://dpforge.com/1/conference/finish</h3>
+Описание: Завершение конференции. Только организатор может завершить конференцию.<br/>
+Требуется авторизация: Да<br/>
+<br/>
+Query-параметры:<br/>
+<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>conference_id</td><td>string</td><td>Да</td><td></td></tr>
+</table>
+<br/>
+Ответ: JSON GenericResponse - Если конференция успешно удалена<br/>
+<br/>
+GenericResponse<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>success</td><td>boolean</td><td>Да</td><td>true - успех, false - произошла ошибка</td></tr>
+</table>
+<br/>
+Ответ: JSON ErrorResponse - В случае ошибки<br/>
+<br/>
+ErrorResponse<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>errorMessage</td><td>string</td><td>Да</td><td></td></tr>
+</table>
+<br/>
+<h3>GET https://dpforge.com/1/conference/get_participants</h3>
+Описание: Получение списка участников<br/>
+Требуется авторизация: Да<br/>
+<br/>
+Query-параметры:<br/>
+<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>conference_id</td><td>string</td><td>Да</td><td></td></tr>
+</table>
+<br/>
+Ответ: JSON ConferenceParticipantsResponse<br/>
+<br/>
+ConferenceParticipantsResponse<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>participants</td><td>ConferenceParticipant[]</td><td>Да</td><td></td></tr>
+</table>
+<br/>
+ConferenceParticipant<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>name</td><td>string</td><td>Да</td><td></td></tr>
+</table>
+<br/>
+<h3>POST https://dpforge.com/1/conference/join_speaker</h3>
+Описание: Подключение участника к конференции<br/>
+Требуется авторизация: Да<br/>
+<br/>
+Query-параметры:<br/>
+<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>conference_id</td><td>string</td><td>Да</td><td></td></tr>
+<tr>
+<td>speaker_name</td><td>string</td><td>Да</td><td></td></tr>
+</table>
+<br/>
+Ответ: JSON ConferenceJoinResponse<br/>
+<br/>
+ConferenceJoinResponse<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>conferenceId</td><td>string</td><td>Да</td><td></td></tr>
+<tr>
+<td>conferenceName</td><td>string</td><td>Да</td><td></td></tr>
+<tr>
+<td>hostId</td><td>string</td><td>Да</td><td>deprecated</td></tr>
+<tr>
+<td>participantId</td><td>string</td><td>Да</td><td>deprecated</td></tr>
+<tr>
+<td>participantName</td><td>string</td><td>Да</td><td></td></tr>
+</table>
+<br/>
+<h2 id='group3'>Speechpad</h2>
+<h3>POST https://dpforge.com/1/speechpad/chunk</h3>
+Описание: Отправка порции аудио<br/>
+Требуется авторизация: Да<br/>
+<br/>
+Query-параметры:<br/>
+<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>speechpad_id</td><td>string</td><td>Да</td><td></td></tr>
+</table>
+<br/>
+Запрос: Raw binary<br/>
+<br/>
+Ответ: JSON SpeechpadChunkResponse<br/>
+<br/>
+SpeechpadChunkResponse<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>results</td><td>TranscribeResult[]</td><td>Да</td><td></td></tr>
+</table>
+<br/>
+TranscribeResult<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>isFinal</td><td>boolean</td><td>Да</td><td></td></tr>
+<tr>
+<td>transcript</td><td>string</td><td>Да</td><td></td></tr>
+<tr>
+<td>confidence</td><td>float</td><td>Да</td><td></td></tr>
+</table>
+<br/>
+<h3>POST https://dpforge.com/1/speechpad/create</h3>
+Описание: Создание голосового блокнота<br/>
+Требуется авторизация: Да<br/>
+<br/>
+Query-параметры:<br/>
+<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>model</td><td>string</td><td>Да</td><td></td></tr>
+</table>
+<br/>
+Ответ: JSON SpeechpadCreateResponse<br/>
+<br/>
+SpeechpadCreateResponse<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>speechpadId</td><td>string</td><td>Да</td><td></td></tr>
+</table>
+<br/>
+<h3>POST https://dpforge.com/1/speechpad/remove</h3>
+Описание: Изменить название архивной записи<br/>
+Требуется авторизация: Да<br/>
+<br/>
+Query-параметры:<br/>
+<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>speechpad_id</td><td>string</td><td>Да</td><td></td></tr>
+</table>
+<br/>
+Ответ: JSON SpeechpadRemoveResponse<br/>
+<br/>
+SpeechpadRemoveResponse<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>speechpadId</td><td>string</td><td>Да</td><td></td></tr>
+</table>
+<br/>
+<h3>POST https://dpforge.com/1/speechpad/rename</h3>
+Описание: Изменить название архивной записи<br/>
+Требуется авторизация: Да<br/>
+<br/>
+Query-параметры:<br/>
+<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>speechpad_id</td><td>string</td><td>Да</td><td></td></tr>
+<tr>
+<td>new_name</td><td>string</td><td>Да</td><td></td></tr>
+</table>
+<br/>
+Ответ: JSON SpeechpadRenameResponse<br/>
+<br/>
+SpeechpadRenameResponse<table>
+<th>Имя</th><th>Тип</th><th>Обязательный</th><th>Описание</th><tr>
+<td>speechpadId</td><td>string</td><td>Да</td><td></td></tr>
+</table>
+<br/>

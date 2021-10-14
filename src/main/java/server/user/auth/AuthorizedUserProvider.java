@@ -20,13 +20,18 @@ public class AuthorizedUserProvider implements HttpHandlerDataProvider<Authorize
 
     @Nullable
     @Override
-    public Object provide(HandlerContext context, Class<?> handlerClass, AuthorizedUser annotation, Class<?> type) throws HandlerException {
-        AccessToken accessToken;
+    public Object provide(
+            HandlerContext context,
+            Class<?> handlerClass,
+            AuthorizedUser annotation,
+            Class<?> type
+    ) throws HandlerException {
         try {
-            accessToken = AuthHttpRequestVerifier.checkAuthorization(accessTokenManager, context.getRequest());
+            AccessToken accessToken
+                    = AuthHttpRequestVerifier.checkAuthorization(accessTokenManager, context.getRequest());
+            return userManager.getUser(accessToken.getLogin());
         } catch (VerificationException e) {
             throw new HandlerException(e.getHttpCode(), e.getErrorResponse());
         }
-        return userManager.getUser(accessToken.getLogin());
     }
 }

@@ -5,6 +5,7 @@ import server.transcribe.yandex.api.GetResultResponse;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 class ResultConverter {
 

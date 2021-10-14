@@ -5,6 +5,7 @@ import server.transcribe.google.GoogleTranscribeService;
 import server.transcribe.yandex.YandexTranscribeService;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.UUID;
 
 public class TranscribeManager {
@@ -22,10 +23,9 @@ public class TranscribeManager {
     }
 
     public String getServiceByTranscribeId(String id) {
-        TranscribeId transcribeId = idProcessor.decode(id);
-        if (transcribeId == null) {
-            throw new IllegalArgumentException("Cannot get service by transcribe id: " + id);
-        }
+        TranscribeId transcribeId = Optional.ofNullable(idProcessor.decode(id))
+                .orElseThrow(() -> new IllegalArgumentException("Cannot get service by transcribe id: " + id));
+
         switch (transcribeId.serviceName) {
             case GOOGLE:
                 return SERVICE_GOOGLE;
@@ -36,19 +36,20 @@ public class TranscribeManager {
         }
     }
 
+    private UploadUrl buildUploadURL(String internalId, TranscribeServiceName transcribeServiceName) {
+        return new UploadUrl(
+                idProcessor.encode(new TranscribeId(transcribeServiceName, internalId)),
+                googleService.generateUploadUrl(internalId)
+        );
+    }
+
     public UploadUrl generateUploadUrl(String service) {
         final String internalId = UUID.randomUUID().toString();
         switch (service) {
             case "google":
-                return new UploadUrl(
-                        idProcessor.encode(new TranscribeId(TranscribeServiceName.GOOGLE, internalId)),
-                        googleService.generateUploadUrl(internalId)
-                );
+                return buildUploadURL(internalId, TranscribeServiceName.GOOGLE);
             case "yandex":
-                return new UploadUrl(
-                        idProcessor.encode(new TranscribeId(TranscribeServiceName.YANDEX, internalId)),
-                        yandexService.generateUploadUrl(internalId)
-                );
+                return buildUploadURL(internalId, TranscribeServiceName.YANDEX);
             default:
                 throw new IllegalArgumentException("Unsupported service: " + service);
         }

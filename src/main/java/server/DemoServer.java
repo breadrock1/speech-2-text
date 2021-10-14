@@ -44,7 +44,7 @@ import java.util.Collections;
 
 public class DemoServer {
 
-    public static final int REVISION = 54;
+    public static final int REVISION = 55;
 
     public static void main(String[] args) throws IOException {
         final ServerConfig config = new ServerConfigReader(new File(args[0])).read();
@@ -53,28 +53,37 @@ public class DemoServer {
         Logger logger = LoggerFactory.createFor(DemoServer.class);
         logger.info("Start");
 
-        DependencyContainer dependencyContainer = new DependencyContainer();
-        dependencyContainer.put(new StaticContentConfig(new File(config.staticContentDir)));
+        final DependencyContainer dependencyContainer = new DependencyContainer();
+        final StaticContentConfig staticContentConfig = new StaticContentConfig(new File(config.staticContentDir));
+        dependencyContainer.put(staticContentConfig);
         dependencyContainer.addFactory(Logger.class, LoggerFactory::createFor);
 
-        AccessTokenManager accessTokenManager = AccessTokenManager.withBase64EncodedKey(config.authSecretKey);
+        final AccessTokenManager accessTokenManager = AccessTokenManager.withBase64EncodedKey(config.authSecretKey);
         dependencyContainer.put(accessTokenManager);
 
         final Firestore firestore = initFirestore(logger);
+        final UserManager userManager = new UserManager(firestore);
+        final UserSettingsManager userSettingsManager = new UserSettingsManager(firestore);
         final ConferenceManager conferenceManager = ConferenceManager.createInstance(firestore);
-
-        dependencyContainer.put(new TranscribeManager().init());
-        dependencyContainer.put(FileItemFactory.class, new DiskFileItemFactory());
+        final SpeechpadManager speechpadManager = new SpeechpadManager();
+        final TranscribeManager transcribeManager = new TranscribeManager();
+        final DiskFileItemFactory diskFileItemFactory = new DiskFileItemFactory();
+        dependencyContainer.put(transcribeManager.init());
+        dependencyContainer.put(FileItemFactory.class, diskFileItemFactory);
         dependencyContainer.put(conferenceManager);
-        dependencyContainer.put(new SpeechpadManager());
-        dependencyContainer.put(new UserManager(firestore));
-        dependencyContainer.put(new UserSettingsManager(firestore));
+        dependencyContainer.put(speechpadManager);
+        dependencyContainer.put(userManager);
+        dependencyContainer.put(userSettingsManager);
 
-        SummaryHttpServer.create(new InetSocketAddress(config.host, config.port))
-                .addRequestVerifier(new AuthHttpRequestVerifier(accessTokenManager))
+        final InetSocketAddress inetSocketAddress = new InetSocketAddress(config.host, config.port);
+        final LocaleHandlerDataProvider localeHandlerDataProvider = new LocaleHandlerDataProvider();
+        final AuthHttpRequestVerifier authHttpRequestVerifier = new AuthHttpRequestVerifier(accessTokenManager);
+        final AuthorizedUserProvider authUserProvider = new AuthorizedUserProvider(userManager, accessTokenManager);
+        SummaryHttpServer.create(inetSocketAddress)
+                .addRequestVerifier(authHttpRequestVerifier)
                 .registerHttpHandlerDataProvider(Inject.class, dependencyContainer)
-                .registerHttpHandlerDataProvider(AuthorizedUser.class, new AuthorizedUserProvider(new UserManager(firestore), accessTokenManager))
-                .registerHttpHandlerDataProvider(CurrentLocale.class, new LocaleHandlerDataProvider())
+                .registerHttpHandlerDataProvider(AuthorizedUser.class, authUserProvider)
+                .registerHttpHandlerDataProvider(CurrentLocale.class, localeHandlerDataProvider)
                 .registerHandler(StaticContentHandler2.class)
                 .registerHandler(DebugHandler.class)
                 .registerHandler(ConferenceHandler.class)
@@ -86,7 +95,8 @@ public class DemoServer {
                 .registerHandler(UploadHandler.class)
                 .start();
 
-        RecurringTaskManager.getInstance().schedule(new CleanUpTask(conferenceManager));
+        final CleanUpTask cleanUpTask = new CleanUpTask(conferenceManager);
+        RecurringTaskManager.getInstance().schedule(cleanUpTask);
     }
 
     private static Firestore initFirestore(Logger logger) throws IOException {
