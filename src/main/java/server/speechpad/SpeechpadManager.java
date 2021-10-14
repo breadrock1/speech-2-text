@@ -2,6 +2,7 @@ package server.speechpad;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import server.realtime_transcribe.RealtimeTranscriber;
 
 import java.util.HashMap;
@@ -31,15 +32,12 @@ public class SpeechpadManager {
         }
     }
 
-    public List<Speechpad> getAllSpeechpads() {
+    public List<String> getAllSpeechpads() {
         synchronized (speechpadMap) {
-            return new ArrayList<>(speechpadMap.values());
-        }
-    }
-
-    public Map<String, Speechpad> getSpeechpadMap() {
-        synchronized (speechpadMap) {
-            return speechpadMap;
+            return speechpadMap.values()
+                .stream()
+                .map(Speechpad::getId)
+                .collect(Collectors.toList());
         }
     }
 
