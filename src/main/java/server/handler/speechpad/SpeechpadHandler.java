@@ -114,8 +114,8 @@ public class SpeechpadHandler {
     SpeechpadCreateResponse getAll() {
         logger.info("Handle get all speechpad archives");
         List<Speechpad> speechpads = speechpadManager.getAllSpeechpads();
-        //return new SpeechpadGetAllResponse(speechpadManager.getAllSpeechpads());
-        return new SpeechpadCreateResponse(speechpads.get(0).getId(), speechpads.get(0).getName());
+        return new SpeechpadGetAllResponse(speechpadManager.getAllSpeechpads());
+        //return new SpeechpadCreateResponse(speechpads.get(0).getId(), speechpads.get(0).getName());
     }
 
     @Description("Получить транскрипцию голосового блокнота")
