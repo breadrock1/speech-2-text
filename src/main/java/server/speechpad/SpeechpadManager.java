@@ -1,6 +1,5 @@
 package server.speechpad;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import server.realtime_transcribe.RealtimeTranscriber;
@@ -32,13 +31,11 @@ public class SpeechpadManager {
         }
     }
 
-    public List<String> getAllSpeechpads() {
-        synchronized (speechpadMap) {
-            return speechpadMap.values()
-                .stream()
-                .map(Speechpad::getId)
-                .collect(Collectors.toList());
-        }
+    public synchronized List<String> getAllSpeechpads() {
+        return speechpadMap.values()
+            .stream()
+            .map(Speechpad::getId)
+            .collect(Collectors.toList());
     }
 
     public Speechpad getSpeechpad(String speechpadId) throws NoSuchSpeechpadException {

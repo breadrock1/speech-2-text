@@ -109,20 +109,19 @@ public class SpeechpadHandler {
         }
     }
 
-    @Description("Получение всех голосовых блокнотов")
+    @Description("Получение списка идентификаторов всех голосовых блокнотов")
     @HandleGet("/getAll")
     SpeechpadListResponse getAll() {
-        logger.info("Handle get all speechpad archives");
-        List<String> speechpads = speechpadManager.getAllSpeechpads();
-        return new SpeechpadListResponse(speechpads);
+        logger.info("Handle get all speechpad ids");
+        return new SpeechpadListResponse(speechpadManager.getAllSpeechpads());
     }
 
-    @Description("Получить транскрипцию голосового блокнота")
+    @Description("Получение транскрипции голосового блокнота по идентификатору")
     @HandleGet("/result")
     SpeechpadChunkResponse result(
         @Query("speechpad_id") String speechpadId
     ) throws NoSuchSpeechpadException {
-        logger.info("Handle get transcribe result by id");
+        logger.info("Handle get speechpad transcribe result by id");
         try {
             Speechpad speechpad = speechpadManager.getSpeechpad(speechpadId);
             return new SpeechpadChunkResponse(speechpad.getTranscribe());
