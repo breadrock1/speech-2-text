@@ -1,5 +1,6 @@
 package server.speechpad;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import server.realtime_transcribe.RealtimeTranscriber;
@@ -31,10 +32,10 @@ public class SpeechpadManager {
         }
     }
 
-    public synchronized List<String> getAllSpeechpads() {
+    public synchronized List<Map<String, String>> getAllSpeechpads() {
         return speechpadMap.values()
             .stream()
-            .map(Speechpad::getId)
+            .map(s -> Collections.singletonMap(s.getId(), s.getName()))
             .collect(Collectors.toList());
     }
 
