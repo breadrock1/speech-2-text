@@ -37,6 +37,12 @@ public class SpeechpadManager {
         }
     }
 
+    public Map<String, Speechpad> getSpeechpadMap() {
+        synchronized (speechpadMap) {
+            return speechpadMap;
+        }
+    }
+
     public Speechpad getSpeechpad(String speechpadId) throws NoSuchSpeechpadException {
         Speechpad speechpad;
         synchronized (speechpadMap) {

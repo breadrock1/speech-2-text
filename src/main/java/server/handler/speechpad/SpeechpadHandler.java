@@ -13,7 +13,8 @@ import server.logging.Logger;
 import server.response.GenericResponse;
 import server.response.speechpad.SpeechpadChunkResponse;
 import server.response.speechpad.SpeechpadCreateResponse;
-import server.response.speechpad.SpeechpadGetAllResponse;
+import server.response.speechpad.SpeechpadListResponse;
+import server.response.speechpad.SpeechpadMapResponse;
 import server.response.speechpad.SpeechpadRenameResponse;
 import server.response.transcribe.TranscribeResult;
 import server.speechpad.NoSuchSpeechpadException;
@@ -111,11 +112,18 @@ public class SpeechpadHandler {
 
     @Description("Получение всех голосовых блокнотов")
     @HandleGet("/getAll")
-    SpeechpadGetAllResponse getAll() {
+    SpeechpadListResponse getAll() {
         logger.info("Handle get all speechpad archives");
         List<Speechpad> speechpads = speechpadManager.getAllSpeechpads();
-        return new SpeechpadGetAllResponse(speechpadManager.getAllSpeechpads());
+        return new SpeechpadListResponse(speechpadManager.getAllSpeechpads());
         //return new SpeechpadCreateResponse(speechpads.get(0).getId(), speechpads.get(0).getName());
+    }
+
+    @Description("Получение всех голосовых блокнотов")
+    @HandleGet("/all")
+    SpeechpadMapResponse all() {
+        logger.info("Handle get all speechpad archives");
+        return new SpeechpadMapResponse(speechpadManager.getSpeechpadMap());
     }
 
     @Description("Получить транскрипцию голосового блокнота")
