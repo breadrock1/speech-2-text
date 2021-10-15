@@ -1,5 +1,6 @@
 package server.speechpad;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,9 +35,12 @@ public class SpeechpadManager {
 
     public synchronized List<Map<String, String>> getAllSpeechpads() {
         return speechpadMap.values()
-            .stream()
-            .map(s -> Collections.singletonMap(s.getId(), s.getName()))
-            .collect(Collectors.toList());
+                .stream()
+                .map(s -> new HashMap<String, String>() {{
+                    put("speechpadId", s.getId());
+                    put("speechpadName", s.getName());
+                }})
+                .collect(Collectors.toList());
     }
 
     public Speechpad getSpeechpad(String speechpadId) throws NoSuchSpeechpadException {
