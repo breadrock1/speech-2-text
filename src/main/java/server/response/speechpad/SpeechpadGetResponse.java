@@ -1,13 +1,18 @@
 package server.response.speechpad;
 
+import java.util.List;
 import server.response.GenericResponse;
-import server.speechpad.Speechpad;
+import server.response.transcribe.TranscribeResult;
 
 public class SpeechpadGetResponse extends GenericResponse {
 
-    private final Speechpad speechpad;
+    private final String speechpadId;
+    private final String speechpadName;
+    private final List<TranscribeResult> transcribeResult;
 
-    public SpeechpadGetResponse(Speechpad speechpad) {
-        this.speechpad = speechpad;
+    public SpeechpadGetResponse(String speechpadId, String speechpadName, List<TranscribeResult> transcribeResult) {
+        this.speechpadId = speechpadId;
+        this.speechpadName = speechpadName;
+        this.transcribeResult = transcribeResult;
     }
 }

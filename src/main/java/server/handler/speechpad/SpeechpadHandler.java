@@ -13,6 +13,7 @@ import server.logging.Logger;
 import server.response.GenericResponse;
 import server.response.speechpad.SpeechpadChunkResponse;
 import server.response.speechpad.SpeechpadCreateResponse;
+import server.response.speechpad.SpeechpadGetResponse;
 import server.response.speechpad.SpeechpadListResponse;
 import server.response.speechpad.SpeechpadRenameResponse;
 import server.response.transcribe.TranscribeResult;
@@ -97,13 +98,13 @@ public class SpeechpadHandler {
 
     @Description("Получение голосового блокнота по идентификатору")
     @HandleGet("/get")
-    SpeechpadCreateResponse get(
+    SpeechpadGetResponse get(
         @Query("speechpad_id") String speechpadId
     ) throws NoSuchSpeechpadException {
         logger.info("Handle get speechpad by id");
         try {
             Speechpad speechpad = speechpadManager.getSpeechpad(speechpadId);
-            return new SpeechpadCreateResponse(speechpad.getId(), speechpad.getName());
+            return new SpeechpadGetResponse(speechpad.getId(), speechpad.getName(), speechpad.getTranscribe());
         } catch (NoSuchSpeechpadException e) {
             throw new NoSuchSpeechpadException(speechpadId);
         }
