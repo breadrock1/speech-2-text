@@ -65,7 +65,7 @@ public class DemoServer {
         final UserManager userManager = new UserManager(firestore);
         final UserSettingsManager userSettingsManager = new UserSettingsManager(firestore);
         final ConferenceManager conferenceManager = ConferenceManager.createInstance(firestore);
-        final SpeechpadManager speechpadManager = new SpeechpadManager();
+        final SpeechpadManager speechpadManager = new SpeechpadManager(firestore);
         final TranscribeManager transcribeManager = new TranscribeManager();
         final DiskFileItemFactory diskFileItemFactory = new DiskFileItemFactory();
         dependencyContainer.put(transcribeManager.init());
