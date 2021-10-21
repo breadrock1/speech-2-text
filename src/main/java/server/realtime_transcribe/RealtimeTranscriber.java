@@ -10,7 +10,6 @@ import com.google.cloud.speech.v1.StreamingRecognitionResult;
 import com.google.cloud.speech.v1.StreamingRecognizeRequest;
 import com.google.cloud.speech.v1.StreamingRecognizeResponse;
 import com.google.protobuf.ByteString;
-import java.util.Arrays;
 import java.util.Collections;
 import server.logging.Logger;
 import server.logging.LoggerFactory;
@@ -141,7 +140,6 @@ public class RealtimeTranscriber {
         @Override
         public void onComplete() {
             stop();
-
         }
     }
 }
