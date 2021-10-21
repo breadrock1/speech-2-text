@@ -141,6 +141,7 @@ public class RealtimeTranscriber {
         @Override
         public void onComplete() {
             stop();
+
         }
     }
 }

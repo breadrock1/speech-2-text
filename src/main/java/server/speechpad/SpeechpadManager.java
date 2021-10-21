@@ -1,5 +1,6 @@
 package server.speechpad;
 
+import com.google.cloud.firestore.CollectionReference;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -12,8 +13,8 @@ import com.google.cloud.firestore.FieldMask;
 import com.google.cloud.firestore.Firestore;
 import io.jsonwebtoken.io.IOException;
 import server.realtime_transcribe.RealtimeTranscriber;
+import server.response.transcribe.TranscribeResult;
 
-import static server.util.FutureUtils.getFuture;
 
 public class SpeechpadManager {
 
@@ -29,64 +30,69 @@ public class SpeechpadManager {
     }
 
 
-    public void storeSpeechpadToDatabase(Speechpad speechpad) {
-        System.out.println(db.collection(COLLECTION_SPEECHPADS));
-        db.collection(COLLECTION_SPEECHPADS).add(speechpad);
-
-//        Optional.ofNullable(getFuture(db.runTransaction(transaction -> speechpad)))
-//                .orElseThrow(() -> new IOException(""));
+    private Speechpad instanceObjectToSpeechpad(DocumentSnapshot documentSnapshot) {
+        return documentSnapshot.toObject(Speechpad.class);
     }
 
-    public Speechpad create(String model, String name) {
+    private Speechpad loadSpeechpadFromDatabase(String speechpadId) {
+        try {
+            DocumentSnapshot docSnapshot = db.collection(COLLECTION_SPEECHPADS)
+                .document(speechpadId)
+                .get()
+                .get();
+            return instanceObjectToSpeechpad(docSnapshot);
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private void deleteSpeechpadFromDatabase(String speechpadId) {
+        db.collection(COLLECTION_SPEECHPADS)
+            .document(speechpadId)
+            .delete();
+    }
+
+    public void storeSpeechpadToDatabase(Speechpad speechpad) {
+        db.collection(COLLECTION_SPEECHPADS)
+            .document(speechpad.getId())
+            .set(speechpad);
+    }
+
+    public Speechpad createSpeechpad(String model, String name) {
         String speechpadId = UUID.randomUUID().toString();
         String speechpadName = (name == null) ? speechpadId : name;
         Speechpad speechpad = new Speechpad(speechpadId, speechpadName, new RealtimeTranscriber(model));
+        storeSpeechpadToDatabase(speechpad);
         synchronized (speechpadMap) {
             speechpadMap.put(speechpadId, speechpad);
         }
         return speechpad;
     }
 
-
-    private void deleteSpeechpadFromDatabase(String speechpadId) {
-
-    }
-
-    public void delete(String speechpadId) throws NoSuchSpeechpadException {
+    public void deleteSpeechpad(String speechpadId) throws NoSuchSpeechpadException {
+        deleteSpeechpadFromDatabase(speechpadId);
         synchronized (speechpadMap) {
-            if (!speechpadMap.containsKey(speechpadId)) {
-                throw new NoSuchSpeechpadException(speechpadId);
-            }
             speechpadMap.remove(speechpadId);
         }
     }
 
-
-
-    private Speechpad instanceObjectToSpeechpad(DocumentSnapshot docSnapshot) throws NoSuchSpeechpadException {
-        return Optional.ofNullable(docSnapshot.toObject(Speechpad.class))
-                .orElseThrow(() -> new NoSuchSpeechpadException(""));
-    }
-
-    private DocumentReference loadSpeechpadFromDatabase(String speechpadId) {
-        return db.collection(COLLECTION_SPEECHPADS).document(speechpadId);
-    }
-
-    public Speechpad getStoredSpeechpad(String speechpadId) {
-        try {
-            ApiFuture<DocumentSnapshot> docRefs = loadSpeechpadFromDatabase(speechpadId).get();
-            DocumentSnapshot docSnapshot = docRefs.get();
-            return instanceObjectToSpeechpad(docSnapshot);
-        } catch (InterruptedException | ExecutionException | NoSuchSpeechpadException e) {
-            e.printStackTrace();
-            return null;
-        }
+    public synchronized List<Map<String, String>> getAllSpeechpads() {
+        Iterable<DocumentReference> iterable = db.collection(COLLECTION_SPEECHPADS).listDocuments();
+        return StreamSupport.stream(iterable.spliterator(), false)
+            .map(DocumentReference::getId)
+            .map(this::loadSpeechpadFromDatabase)
+            .map(speechpad -> new HashMap<String, String>() {{
+                put("speechpadId", speechpad.getId());
+                put("speechpadName", speechpad.getName());
+            }})
+            .collect(Collectors.toList());
     }
 
     public Speechpad getSpeechpad(String speechpadId) throws NoSuchSpeechpadException {
         Speechpad speechpad;
         synchronized (speechpadMap) {
-            speechpad = speechpadMap.getOrDefault(speechpadId, null);
+            speechpad = loadSpeechpadFromDatabase(speechpadId);
         }
         if (speechpad == null) {
             throw new NoSuchSpeechpadException(speechpadId);
@@ -94,30 +100,28 @@ public class SpeechpadManager {
         return speechpad;
     }
 
+    public Speechpad renameSpeechpad(String speechpadId, String newName) throws NoSuchSpeechpadException {
+        Speechpad speechpad = Optional.ofNullable(loadSpeechpadFromDatabase(speechpadId))
+            .orElseThrow(() -> new NoSuchSpeechpadException(speechpadId));
+        speechpad.setName(newName);
 
-    private List<String> getAllSpeechpadsFromDatabase() throws ExecutionException, InterruptedException {
-        return db.getAll(loadSpeechpadFromDatabase("")).get()
-                .stream()
-                .map(d -> Objects.requireNonNull(d.get(COLLECTION_SPEECHPADS)).toString())
-                .collect(Collectors.toList());
+        db.collection(COLLECTION_SPEECHPADS)
+            .document(speechpadId)
+            .update("name", newName);
+
+        return speechpad;
     }
 
-    public synchronized List<Map<String, String>> getAllSpeechpads() {
-        return speechpadMap.values()
-                .stream()
-                .map(s -> new HashMap<String, String>() {{
-                    put("speechpadId", s.getId());
-                    put("speechpadName", s.getName());
-                }})
-                .collect(Collectors.toList());
-        
-        StreamSupport.stream(db.collection(COLLECTION_SPEECHPADS).listDocuments().spliterator(), true)
-                        .map(doc -> new HashMap<String, String>() {{
-                            put("speechpadId", doc.get("id"));
-                            put("speechpadName", doc.get("name"));
-                        }})
-                        .collect(Collectors.toList());
-    }
+    public Speechpad editSpeechpadTranscribe(String speechpadId, String data) throws NoSuchSpeechpadException {
+        Speechpad speechpad = Optional.ofNullable(loadSpeechpadFromDatabase(speechpadId))
+            .orElseThrow(() -> new NoSuchSpeechpadException(speechpadId));
+        speechpad.setTranscribe(data);
 
+        db.collection(COLLECTION_SPEECHPADS)
+            .document(speechpadId)
+            .update("transcribe", data);
+
+        return speechpad;
+    }
 
 }
