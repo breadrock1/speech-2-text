@@ -8,6 +8,7 @@ public class TranscriptionConfig {
     private final boolean diarizationEnabled;
     private final int minSpeakerCount;
     private final int maxSpeakerCount;
+    private final String audioFormat;
 
     @Nullable
     private final String model;
@@ -18,6 +19,7 @@ public class TranscriptionConfig {
         minSpeakerCount = builder.minSpeakerCount;
         maxSpeakerCount = builder.maxSpeakerCount;
         model = builder.model;
+        audioFormat = builder.audioFormat;
     }
 
     public String getService() {
@@ -36,6 +38,10 @@ public class TranscriptionConfig {
         return maxSpeakerCount;
     }
 
+    public String getAudioFormat() {
+        return audioFormat;
+    }
+
     @Nullable
     public String getModel() {
         return model;
@@ -51,6 +57,7 @@ public class TranscriptionConfig {
         private boolean diarizationEnabled = false;
         private int minSpeakerCount = 0;
         private int maxSpeakerCount = 0;
+        private String audioFormat = "";
 
         @Nullable
         private String model;
@@ -77,6 +84,11 @@ public class TranscriptionConfig {
 
         public Builder model(@Nullable String model) {
             this.model = model;
+            return this;
+        }
+
+        public Builder audioFormat(String audioFormat) {
+            this.audioFormat = audioFormat;
             return this;
         }
 
