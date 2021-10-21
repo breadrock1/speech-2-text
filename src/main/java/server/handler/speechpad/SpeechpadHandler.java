@@ -121,7 +121,7 @@ public class SpeechpadHandler {
     ) throws NoSuchSpeechpadException {
         logger.info("Handle update speechpad transcribe");
         try {
-            Speechpad speechpad = speechpadManager.editSpeechpadTranscribe(speechpadId, data);
+            Speechpad speechpad = speechpadManager.updateSpeechpadTranscribe(speechpadId, data);
             return new SpeechpadFullObjectResponse(speechpad.getId(), speechpad.getName(), speechpad.getTranscribe());
         } catch (NoSuchSpeechpadException e) {
             throw new NoSuchSpeechpadException(speechpadId);

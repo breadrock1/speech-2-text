@@ -1,19 +1,18 @@
 package server.speechpad;
 
-import com.google.cloud.firestore.CollectionReference;
-import java.util.*;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
-import com.google.cloud.firestore.FieldMask;
 import com.google.cloud.firestore.Firestore;
-import io.jsonwebtoken.io.IOException;
 import server.realtime_transcribe.RealtimeTranscriber;
-import server.response.transcribe.TranscribeResult;
 
 
 public class SpeechpadManager {
@@ -112,7 +111,7 @@ public class SpeechpadManager {
         return speechpad;
     }
 
-    public Speechpad editSpeechpadTranscribe(String speechpadId, String data) throws NoSuchSpeechpadException {
+    public Speechpad updateSpeechpadTranscribe(String speechpadId, String data) throws NoSuchSpeechpadException {
         Speechpad speechpad = Optional.ofNullable(loadSpeechpadFromDatabase(speechpadId))
             .orElseThrow(() -> new NoSuchSpeechpadException(speechpadId));
         speechpad.setTranscribe(data);
