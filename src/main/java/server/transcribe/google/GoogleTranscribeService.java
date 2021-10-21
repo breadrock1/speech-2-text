@@ -5,6 +5,7 @@ import com.google.cloud.speech.v1.LongRunningRecognizeMetadata;
 import com.google.cloud.speech.v1.LongRunningRecognizeResponse;
 import com.google.cloud.speech.v1.RecognitionAudio;
 import com.google.cloud.speech.v1.RecognitionConfig;
+import com.google.cloud.speech.v1.RecognitionConfig.AudioEncoding;
 import com.google.cloud.speech.v1.SpeakerDiarizationConfig;
 import com.google.cloud.speech.v1.SpeechClient;
 import com.google.cloud.speech.v1.SpeechRecognitionResult;
@@ -172,8 +173,40 @@ public class GoogleTranscribeService implements TranscribeService {
         }
 
         private RecognitionConfig toRecognitionConfig(TranscriptionConfig config) {
+            AudioEncoding audioEncoding;
+
+            switch (config.getAudioFormat()) {
+                case "LINEAR16":
+                    audioEncoding = AudioEncoding.LINEAR16;
+                    break;
+                case "FLAC":
+                    audioEncoding = AudioEncoding.FLAC;
+                    break;
+                case "MULAW":
+                    audioEncoding = AudioEncoding.MULAW;
+                    break;
+                case "AMR":
+                    audioEncoding = AudioEncoding.AMR;
+                    break;
+                case "AMR_WB":
+                    audioEncoding = AudioEncoding.AMR_WB;
+                    break;
+                case "OGG_OPUS":
+                    audioEncoding = AudioEncoding.OGG_OPUS;
+                    break;
+                case "SPEEX_WITH_HEADER_BYTE":
+                    audioEncoding = AudioEncoding.SPEEX_WITH_HEADER_BYTE;
+                    break;
+                case "UNRECOGNIZED":
+                    audioEncoding = AudioEncoding.UNRECOGNIZED;
+                    break;
+                default:
+                    audioEncoding = AudioEncoding.LINEAR16;
+                    //audioEncoding = AudioEncoding.ENCODING_UNSPECIFIED;
+            }
+
             RecognitionConfig.Builder recognitionBuilder = RecognitionConfig.newBuilder()
-                    .setEncoding(RecognitionConfig.AudioEncoding.LINEAR16)
+                    .setEncoding(audioEncoding)
                     .setAudioChannelCount(1)
                     .setLanguageCode("ru-RU")
                     .setModel(config.getModel() == null ? DEFAULT_MODEL : config.getModel())

@@ -71,7 +71,8 @@ public class TranscribeHandler {
             @Query(value = "diarization_enabled", optional = true) boolean diarizationEnabled,
             @Query(value = "min_speaker_count", optional = true) int minSpeakerCount,
             @Query(value = "max_speaker_count", optional = true) int maxSpeakerCount,
-            @Query(value = "model", optional = true) @Description(MODEL_DOCUMENTATION) String model
+            @Query(value = "model", optional = true) @Description(MODEL_DOCUMENTATION) String model,
+            @Query(value = "audio_format") String audioFormat
     ) {
         logger.info(
                 "Handle transcribe start; transcribe_id=%s; diarization_enabled=%s; min_speaker_count=%d; max_speaker_count=%d; model=%s",
@@ -85,6 +86,7 @@ public class TranscribeHandler {
                     .minSpeakerCount(minSpeakerCount)
                     .maxSpeakerCount(maxSpeakerCount)
                     .model(model)
+                    .audioFormat(audioFormat)
                     .build();
             transcribeManager.start(transcribeId, config);
         }
