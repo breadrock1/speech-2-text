@@ -147,4 +147,21 @@ public class SpeechpadHandler {
         }
     }
 
+
+    @Description("Изменение транскрипции голосового блокнота")
+    @HandlePost("/store")
+    GenericResponse store(
+            @Query("speechpad_id") String speechpadId
+    ) throws NoSuchSpeechpadException {
+        logger.info("Handle store speechpad transcribe");
+        try {
+            Speechpad speechpad = speechpadManager.getSpeechpad(speechpadId);
+            System.out.println(speechpad.getId());
+            speechpadManager.storeSpeechpadToDatabase(speechpad);
+            return new GenericResponse(true);
+        } catch (NoSuchSpeechpadException e) {
+            throw new NoSuchSpeechpadException("Failed");
+        }
+    }
+
 }
