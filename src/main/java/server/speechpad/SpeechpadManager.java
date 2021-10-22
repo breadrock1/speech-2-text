@@ -1,13 +1,18 @@
 package server.speechpad;
 
+import com.google.cloud.firestore.DocumentReference;
+import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import java.util.stream.StreamSupport;
 import server.realtime_transcribe.RealtimeTranscriber;
 import server.response.transcribe.TranscribeResult;
 
@@ -50,14 +55,29 @@ public class SpeechpadManager {
         }
     }
 
-    public synchronized List<Map<String, String>> getAllSpeechpads() {
-        return speechpadMap.values()
-            .stream()
-            .map(s -> new HashMap<String, String>() {{
-                put("speechpadId", s.getId());
-                put("speechpadName", s.getName());
-            }})
-            .collect(Collectors.toList());
+    private DocumentSnapshot getSnapshot(DocumentReference docRef) {
+        try {
+            return docRef.get().get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<Map<String, String>> getAllSpeechpads() {
+        Iterable<DocumentReference> iterable = db.collection("speechpads")
+            .listDocuments();
+        List<Map<String, String>> speechpads =
+            StreamSupport.stream(iterable.spliterator(), true)
+                .map(this::getSnapshot)
+                .filter(Objects::nonNull)
+                .map(d -> new HashMap<String, String>() {{
+                    put("speechpadId", d.get("id").toString());
+                    put("speechpadName", d.get("name").toString());
+                }})
+                .collect(Collectors.toList());
+
+        return speechpads;
     }
 
     public Speechpad getSpeechpad(String speechpadId) throws NoSuchSpeechpadException {
