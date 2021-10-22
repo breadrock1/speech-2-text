@@ -1,6 +1,7 @@
 package server.handler.speechpad;
 
 import doc.annotation.Description;
+import java.util.ArrayList;
 import server.handler.HandlerException;
 import server.http.annotation.Body;
 import server.http.annotation.HandleGet;
@@ -117,19 +118,19 @@ public class SpeechpadHandler {
         return new SpeechpadListResponse(speechpadManager.getAllSpeechpads());
     }
 
-    @Description("Получение транскрипции голосового блокнота по идентификатору")
-    @HandleGet("/result")
-    SpeechpadChunkResponse result(
-        @Query("speechpad_id") String speechpadId
-    ) throws NoSuchSpeechpadException {
-        logger.info("Handle get speechpad transcribe result by id");
-        try {
-            Speechpad speechpad = speechpadManager.getSpeechpad(speechpadId);
-            return new SpeechpadChunkResponse(speechpad.getTranscribe());
-        } catch (NoSuchSpeechpadException e) {
-            throw new NoSuchSpeechpadException(speechpadId);
-        }
-    }
+//    @Description("Получение транскрипции голосового блокнота по идентификатору")
+//    @HandleGet("/result")
+//    SpeechpadChunkResponse result(
+//        @Query("speechpad_id") String speechpadId
+//    ) throws NoSuchSpeechpadException {
+//        logger.info("Handle get speechpad transcribe result by id");
+//        try {
+//            Speechpad speechpad = speechpadManager.getSpeechpad(speechpadId);
+//            return new SpeechpadChunkResponse(speechpad.getTranscribeee());
+//        } catch (NoSuchSpeechpadException e) {
+//            throw new NoSuchSpeechpadException(speechpadId);
+//        }
+//    }
 
     @Description("Изменение транскрипции голосового блокнота")
     @HandlePost("/edit")
@@ -140,7 +141,8 @@ public class SpeechpadHandler {
         logger.info("Handle edit speechpad transcribe");
         try {
             Speechpad speechpad = speechpadManager.getSpeechpad(speechpadId);
-            List<TranscribeResult> result = speechpad.update(new TranscribeResult(data));
+            List<TranscribeResult> result = new ArrayList<>();
+            //speechpad.update(new TranscribeResult(data));
             return new SpeechpadChunkResponse(result);
         } catch (NoSuchSpeechpadException e) {
             throw new NoSuchSpeechpadException(speechpadId);
@@ -155,7 +157,6 @@ public class SpeechpadHandler {
         logger.info("Handle store speechpad transcribe");
         try {
             Speechpad speechpad = speechpadManager.getSpeechpad(speechpadId);
-            System.out.println(speechpad.getId());
             speechpadManager.storeSpeechpad(speechpad);
             return new GenericResponse(true);
         } catch (NoSuchSpeechpadException e) {

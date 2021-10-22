@@ -30,11 +30,28 @@ public class RealtimeTranscriber {
     private Observer responseObserver;
     private ClientStream<StreamingRecognizeRequest> clientStream;
 
+    private final List<TranscribeResult> allTranscripts = new ArrayList<>();
     private final List<TranscribeResult> transcribeResults = new ArrayList<>();
     private final Logger logger = LoggerFactory.createFor(RealtimeTranscriber.class);
 
     public RealtimeTranscriber(String model) {
         this.model = model;
+    }
+
+    public synchronized void deleteAllTranscribeResult() {
+        this.allTranscripts.clear();
+    }
+
+    public List<TranscribeResult> getAllTranscribeResult() {
+        synchronized(allTranscripts) {
+            return this.allTranscripts;
+        }
+    }
+
+    public void updateAllTrascripts(List<TranscribeResult> flushed) {
+        synchronized(allTranscripts) {
+            allTranscripts.addAll(flushed);
+        }
     }
 
     public synchronized void append(final byte[] data) throws IOException {
@@ -44,14 +61,6 @@ public class RealtimeTranscriber {
                 .setAudioContent(ByteString.copyFrom(data))
                 .build();
         clientStream.send(request);
-    }
-
-    public List<TranscribeResult> update(TranscribeResult transcribeResult) {
-        synchronized (transcribeResults) {
-            this.transcribeResults.clear();
-            this.transcribeResults.addAll(Collections.singletonList(transcribeResult));
-        }
-        return transcribeResults;
     }
 
     public List<TranscribeResult> flushResult() {

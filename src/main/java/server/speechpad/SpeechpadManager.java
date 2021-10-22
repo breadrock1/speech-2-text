@@ -1,13 +1,15 @@
 package server.speechpad;
 
 import com.google.cloud.firestore.Firestore;
+
 import java.util.List;
 import java.util.stream.Collectors;
-import server.realtime_transcribe.RealtimeTranscriber;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+
+import server.realtime_transcribe.RealtimeTranscriber;
+import server.response.transcribe.TranscribeResult;
 
 public class SpeechpadManager {
 
@@ -70,6 +72,15 @@ public class SpeechpadManager {
     }
 
     public void storeSpeechpad(Speechpad speechpad) {
+        TranscribeResult data = speechpad.realtimeTranscriber
+                .getAllTranscribeResult()
+                .parallelStream()
+                .filter(t -> t.isFinal)
+                .findFirst()
+                .orElse(new TranscribeResult(""));
+        speechpad.setTranscribe(data);
+        speechpad.realtimeTranscriber.deleteAllTranscribeResult();
+
         db.runTransaction(transaction -> {
             db.collection("speechpads")
                 .document(speechpad.getId())
