@@ -1,5 +1,6 @@
 package server.speechpad;
 
+import com.google.cloud.firestore.Firestore;
 import java.util.List;
 import java.util.stream.Collectors;
 import server.realtime_transcribe.RealtimeTranscriber;
@@ -10,7 +11,13 @@ import java.util.UUID;
 
 public class SpeechpadManager {
 
+    private final Firestore db;
+
     private final Map<String, Speechpad> speechpadMap = new HashMap<>();
+
+    public SpeechpadManager(Firestore db) {
+        this.db = db;
+    }
 
     public Speechpad create(String model, String name) {
         String speechpadId = UUID.randomUUID().toString();
@@ -22,23 +29,33 @@ public class SpeechpadManager {
         return speechpad;
     }
 
+    private void dbDelete(String speechpadId) {
+        db.runTransaction(transaction -> {
+            db.collection("speechpads")
+                .document(speechpadId)
+                .delete();
+            return null;
+        });
+    }
+
     public void delete(String speechpadId) throws NoSuchSpeechpadException {
+        dbDelete(speechpadId);
         synchronized (speechpadMap) {
-            if (!speechpadMap.containsKey(speechpadId)) {
-                throw new NoSuchSpeechpadException(speechpadId);
-            }
+            //if (!speechpadMap.containsKey(speechpadId)) {
+            //    throw new NoSuchSpeechpadException(speechpadId);
+            //}
             speechpadMap.remove(speechpadId);
         }
     }
 
     public synchronized List<Map<String, String>> getAllSpeechpads() {
         return speechpadMap.values()
-                .stream()
-                .map(s -> new HashMap<String, String>() {{
-                    put("speechpadId", s.getId());
-                    put("speechpadName", s.getName());
-                }})
-                .collect(Collectors.toList());
+            .stream()
+            .map(s -> new HashMap<String, String>() {{
+                put("speechpadId", s.getId());
+                put("speechpadName", s.getName());
+            }})
+            .collect(Collectors.toList());
     }
 
     public Speechpad getSpeechpad(String speechpadId) throws NoSuchSpeechpadException {
@@ -50,5 +67,14 @@ public class SpeechpadManager {
             throw new NoSuchSpeechpadException(speechpadId);
         }
         return speechpad;
+    }
+
+    public void storeSpeechpad(Speechpad speechpad) {
+        db.runTransaction(transaction -> {
+            db.collection("speechpads")
+                .document(speechpad.getId())
+                .set(speechpad);
+            return null;
+        });
     }
 }
