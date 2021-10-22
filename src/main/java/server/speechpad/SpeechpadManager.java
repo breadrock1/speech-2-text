@@ -22,8 +22,28 @@ public class SpeechpadManager {
 
     private final Map<String, Speechpad> speechpadMap = new HashMap<>();
 
+
     public SpeechpadManager(Firestore db) {
         this.db = db;
+    }
+
+
+    public void storeSpeechpad(Speechpad speechpad) {
+        TranscribeResult data = speechpad.realtimeTranscriber
+            .getAllTranscribeResult()
+            .parallelStream()
+            .filter(t -> t.isFinal)
+            .findFirst()
+            .orElse(new TranscribeResult(""));
+        speechpad.setTranscribe(data);
+        speechpad.realtimeTranscriber.deleteAllTranscribeResult();
+
+        db.runTransaction(transaction -> {
+            db.collection("speechpads")
+                .document(speechpad.getId())
+                .set(speechpad);
+            return null;
+        });
     }
 
     public Speechpad create(String model, String name) {
@@ -36,24 +56,6 @@ public class SpeechpadManager {
         return speechpad;
     }
 
-    private void dbDelete(String speechpadId) {
-        db.runTransaction(transaction -> {
-            db.collection("speechpads")
-                .document(speechpadId)
-                .delete();
-            return null;
-        });
-    }
-
-    public void delete(String speechpadId) throws NoSuchSpeechpadException {
-        dbDelete(speechpadId);
-        synchronized (speechpadMap) {
-            //if (!speechpadMap.containsKey(speechpadId)) {
-            //    throw new NoSuchSpeechpadException(speechpadId);
-            //}
-            speechpadMap.remove(speechpadId);
-        }
-    }
 
     private DocumentSnapshot getSnapshot(DocumentReference docRef) {
         try {
@@ -67,18 +69,42 @@ public class SpeechpadManager {
     public List<Map<String, String>> getAllSpeechpads() {
         Iterable<DocumentReference> iterable = db.collection("speechpads")
             .listDocuments();
-        List<Map<String, String>> speechpads =
-            StreamSupport.stream(iterable.spliterator(), true)
-                .map(this::getSnapshot)
-                .filter(Objects::nonNull)
-                .map(d -> new HashMap<String, String>() {{
-                    put("speechpadId", d.get("id").toString());
-                    put("speechpadName", d.get("name").toString());
-                }})
-                .collect(Collectors.toList());
-
-        return speechpads;
+        return StreamSupport.stream(iterable.spliterator(), true)
+            .map(this::getSnapshot)
+            .filter(Objects::nonNull)
+            .map(d -> new HashMap<String, String>() {{
+                put("speechpadId", d.get("id").toString());
+                put("speechpadName", d.get("name").toString());
+            }})
+            .collect(Collectors.toList());
     }
+
+
+    private void dbDelete(String speechpadId) {
+        db.runTransaction(transaction -> {
+            db.collection("speechpads")
+                .document(speechpadId)
+                .delete();
+            return null;
+        });
+    }
+
+    public void delete(String speechpadId) throws NoSuchSpeechpadException {
+        dbDelete(speechpadId);
+        synchronized (speechpadMap) {
+            speechpadMap.remove(speechpadId);
+        }
+    }
+
+
+    public boolean renameSpeechpad(String speechpadId, String newName) throws NoSuchSpeechpadException {
+        db.collection("speechpads")
+            .document(speechpadId)
+            .update("name", newName);
+
+        return true;
+    }
+
 
     public Speechpad getSpeechpad(String speechpadId) throws NoSuchSpeechpadException {
         Speechpad speechpad;
@@ -89,23 +115,5 @@ public class SpeechpadManager {
             throw new NoSuchSpeechpadException(speechpadId);
         }
         return speechpad;
-    }
-
-    public void storeSpeechpad(Speechpad speechpad) {
-        TranscribeResult data = speechpad.realtimeTranscriber
-                .getAllTranscribeResult()
-                .parallelStream()
-                .filter(t -> t.isFinal)
-                .findFirst()
-                .orElse(new TranscribeResult(""));
-        speechpad.setTranscribe(data);
-        speechpad.realtimeTranscriber.deleteAllTranscribeResult();
-
-        db.runTransaction(transaction -> {
-            db.collection("speechpads")
-                .document(speechpad.getId())
-                .set(speechpad);
-            return null;
-        });
     }
 }

@@ -68,15 +68,14 @@ public class SpeechpadHandler {
 
     @Description("Переименование голосового блокнота")
     @HandlePost("/rename")
-    SpeechpadRenameResponse rename(
+    GenericResponse rename(
         @Query("speechpad_id") String speechpadId,
         @Query("new_name") String newName
     ) throws NoSuchSpeechpadException {
         logger.info("Handle rename speechpad");
         try {
-            Speechpad speechpad = speechpadManager.getSpeechpad(speechpadId);
-            speechpad.setName(newName);
-            return new SpeechpadRenameResponse(speechpad.getId(), speechpad.getName());
+            boolean status = speechpadManager.renameSpeechpad(speechpadId, newName);
+            return new GenericResponse(status);
         } catch (NoSuchSpeechpadException e) {
             throw new NoSuchSpeechpadException(speechpadId);
         }
@@ -117,20 +116,6 @@ public class SpeechpadHandler {
         logger.info("Handle get all speechpad ids");
         return new SpeechpadListResponse(speechpadManager.getAllSpeechpads());
     }
-
-//    @Description("Получение транскрипции голосового блокнота по идентификатору")
-//    @HandleGet("/result")
-//    SpeechpadChunkResponse result(
-//        @Query("speechpad_id") String speechpadId
-//    ) throws NoSuchSpeechpadException {
-//        logger.info("Handle get speechpad transcribe result by id");
-//        try {
-//            Speechpad speechpad = speechpadManager.getSpeechpad(speechpadId);
-//            return new SpeechpadChunkResponse(speechpad.getTranscribeee());
-//        } catch (NoSuchSpeechpadException e) {
-//            throw new NoSuchSpeechpadException(speechpadId);
-//        }
-//    }
 
     @Description("Изменение транскрипции голосового блокнота")
     @HandlePost("/edit")
