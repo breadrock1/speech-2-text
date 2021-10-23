@@ -122,14 +122,40 @@ public class SpeechpadManager {
         return true;
     }
 
-    
+
+    private Speechpad loadSpeechpadFromDatabase(String speechpadId) {
+        try {
+            DocumentSnapshot snapshot = db.collection("speechpads")
+                .document(speechpadId)
+                .get()
+                .get();
+
+            Map<String, Object> test = (Map<String, Object>) snapshot.get("transcribe");
+
+            return new Speechpad(
+                snapshot.get("id").toString(),
+                snapshot.get("name").toString(),
+                new TranscribeResult(test.get("transcript").toString())
+            );
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public Speechpad getSpeechpad(String speechpadId) throws NoSuchSpeechpadException {
         Speechpad speechpad;
         synchronized (speechpadMap) {
             speechpad = speechpadMap.getOrDefault(speechpadId, null);
         }
         if (speechpad == null) {
+            speechpad = loadSpeechpadFromDatabase(speechpadId);
+        }
+        if (speechpad == null) {
             throw new NoSuchSpeechpadException(speechpadId);
+        }
+        synchronized (speechpadMap) {
+            speechpadMap.put(speechpadId, speechpad);
         }
         return speechpad;
     }

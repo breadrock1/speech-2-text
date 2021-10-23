@@ -20,6 +20,13 @@ public class Speechpad {
         this.realtimeTranscriber = new RealtimeTranscriber("default");
     }
 
+    public Speechpad(String id, String name, TranscribeResult transcribe) {
+        this.id = id;
+        this.name = name;
+        this.transcribe = transcribe;
+        this.realtimeTranscriber = new RealtimeTranscriber("default");
+    }
+
     public Speechpad(String id, String name, RealtimeTranscriber realtimeTranscriber) {
         this.id = id;
         this.name = name;
