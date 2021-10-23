@@ -106,6 +106,23 @@ public class SpeechpadManager {
     }
 
 
+    public boolean editTransriptResult(String speechpadId, String data) throws NoSuchSpeechpadException {
+        Speechpad speechpad = getSpeechpad(speechpadId);
+        TranscribeResult result = new TranscribeResult(data);
+        speechpad.setTranscribe(result);
+        speechpad.realtimeTranscriber.deleteAllTranscribeResult();
+
+        db.runTransaction(transaction -> {
+            db.collection("speechpads")
+                .document(speechpad.getId())
+                .update("transcribe", result);
+            return null;
+        });
+
+        return true;
+    }
+
+    
     public Speechpad getSpeechpad(String speechpadId) throws NoSuchSpeechpadException {
         Speechpad speechpad;
         synchronized (speechpadMap) {

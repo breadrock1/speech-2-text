@@ -119,16 +119,14 @@ public class SpeechpadHandler {
 
     @Description("Изменение транскрипции голосового блокнота")
     @HandlePost("/edit")
-    SpeechpadChunkResponse edit(
+    GenericResponse edit(
         @Query("speechpad_id") String speechpadId,
         @Query("transcribe") String data
     ) throws NoSuchSpeechpadException {
         logger.info("Handle edit speechpad transcribe");
         try {
-            Speechpad speechpad = speechpadManager.getSpeechpad(speechpadId);
-            List<TranscribeResult> result = new ArrayList<>();
-            //speechpad.update(new TranscribeResult(data));
-            return new SpeechpadChunkResponse(result);
+            boolean status = speechpadManager.editTransriptResult(speechpadId, data);
+            return new GenericResponse(true);
         } catch (NoSuchSpeechpadException e) {
             throw new NoSuchSpeechpadException(speechpadId);
         }
