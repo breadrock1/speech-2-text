@@ -3,5 +3,5 @@
   "port": 8080,
   "staticContentDir": "static-content",
   "loggerType": "system-out",
-  "authSecretKey": "lhUm6skqFTRQMUqoLDb49rg6USOu+Vkkw2cgdq5pd0Q="
+  "authSecretKey": ""
 }
